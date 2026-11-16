@@ -29,17 +29,16 @@ def describe_tables(db):
 
 def schema_diagram(tables):
     lines = [
-        "digraph schema {", 'rankdir=LR; bgcolor="transparent";',
+        "graph schema {", 'rankdir=LR; bgcolor="transparent";',
         'node [shape=box style="rounded,filled" fillcolor="#eaf5f4" color="#588b86"];',
-        'edge [color="#627673" fontcolor="#384d49" fontsize=10];',
+        'edge [color="#627673"];',
     ]
     for table, _, fields, _ in tables:
         primary_key = ", ".join(field["name"] for field in fields if field["pk"])
         lines.append(f'{table} [label="{table}\\nPK {primary_key}"];')
     for table, _, _, keys in tables:
         for parts in keys:
-            columns = ", ".join(part["from"] for part in parts)
-            lines.append(f'{table} -> {parts[0]["table"]} [label="{columns}"];')
+            lines.append(f'{table} -- {parts[0]["table"]};')
     return "\n".join([*lines, "}"])
 
 
@@ -53,8 +52,8 @@ def show_schema():
         tables = list(describe_tables(db))
 
     st.graphviz_chart(schema_diagram(tables), width="stretch",
-                      alt="Five SQLite tables with arrows from foreign keys to referenced tables.")
-    st.caption("Each arrow points from a foreign key to its referenced table.")
+                      alt="Five SQLite tables connected by their foreign-key relationships.")
+    st.caption("Expand a table below to see its foreign keys.")
     st.markdown(
         "The composite foreign keys in **weight** and **treatments** ensure that a linked "
         "check-in belongs to the same patient. A treatment can also be recorded without a check-in."
