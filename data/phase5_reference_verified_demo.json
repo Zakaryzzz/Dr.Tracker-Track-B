@@ -1,0 +1,1016 @@
+{
+  "annotation_origin": "AI-assisted draft based on original source wording; independent human verification required.",
+  "selection": "Purposive coverage across five patients and repeated source wording; not a random sample.",
+  "instructions": "Review source wording independently of parser outputs. Edit or remove draft mentions, add missed mentions, and identify yourself in verified_by before marking each case verified. Use null for unsupported fields. Preserve literal contiguous quotes; assess event linkage separately.",
+  "cases": [
+    {
+      "checkin_id": "demo-P001-01-1",
+      "submitted_at": "2026-09-07T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 3 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-01",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 3,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 3 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-01-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-02-1",
+      "submitted_at": "2026-09-08T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 3 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-02",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 3,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 3 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-02-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-03-1",
+      "submitted_at": "2026-09-09T08:00:00",
+      "original_free_text": "The back of my throat is sore again, around a 3 today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The back of my throat is sore again, around a 3 today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Number has no explicit scale; again does not specify a count.",
+          "checkin_id": "demo-P001-03-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-05-1",
+      "submitted_at": "2026-09-11T08:00:00",
+      "original_free_text": "The back of my throat is sore again, around a 4 today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The back of my throat is sore again, around a 4 today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Number has no explicit scale; again does not specify a count.",
+          "checkin_id": "demo-P001-05-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-07-1",
+      "submitted_at": "2026-09-13T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 4 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 4,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 4 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-07-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-09-1",
+      "submitted_at": "2026-09-15T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 5 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 5,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 5 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-09-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-10-1",
+      "submitted_at": "2026-09-16T08:00:00",
+      "original_free_text": "The back of my throat is sore again, around a 5 today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The back of my throat is sore again, around a 5 today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Number has no explicit scale; again does not specify a count.",
+          "checkin_id": "demo-P001-10-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-12-1",
+      "submitted_at": "2026-09-18T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 6 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 6,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 6 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-12-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-16-1",
+      "submitted_at": "2026-09-22T08:00:00",
+      "original_free_text": "The back of my throat is sore again, around a 6 today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The back of my throat is sore again, around a 6 today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Number has no explicit scale; again does not specify a count.",
+          "checkin_id": "demo-P001-16-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-17-1",
+      "submitted_at": "2026-09-23T08:00:00",
+      "original_free_text": "The back of my throat is sore again, around a 7 today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The back of my throat is sore again, around a 7 today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Number has no explicit scale; again does not specify a count.",
+          "checkin_id": "demo-P001-17-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-18-2",
+      "submitted_at": "2026-09-24T20:00:00",
+      "original_free_text": "My throat was sore this morning, but the new pain is under my jaw.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "My throat was sore this morning",
+          "observed_date": null,
+          "observed_time_text": "this morning",
+          "notes": null,
+          "checkin_id": "demo-P001-18-2"
+        },
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "the new pain is under my jaw",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": "Distinct site and explicitly new pain; onset time unspecified.",
+          "checkin_id": "demo-P001-18-2"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-20-1",
+      "submitted_at": "2026-09-26T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 8 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 8,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 8 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-20-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-22-1",
+      "submitted_at": "2026-09-28T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 7 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 7,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 7 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-22-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-24-1",
+      "submitted_at": "2026-09-30T08:00:00",
+      "original_free_text": "Swallowing at lunch made my throat hurt about 9 out of 10.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": 9,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing at lunch made my throat hurt about 9 out of 10.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P001-24-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-25-1",
+      "submitted_at": "2026-10-01T08:00:00",
+      "original_free_text": "My throat hurts badly, and there's a sore inside my cheek.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "My throat hurts badly",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": "Vague intensity.",
+          "checkin_id": "demo-P001-25-1"
+        },
+        {
+          "measure": "mouth_sores",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "there's a sore inside my cheek.",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": null,
+          "checkin_id": "demo-P001-25-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P001-26-1",
+      "submitted_at": "2026-10-02T08:00:00",
+      "original_free_text": "The back of my throat is sore again, around a 8 today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The back of my throat is sore again, around a 8 today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Number has no explicit scale; again does not specify a count.",
+          "checkin_id": "demo-P001-26-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-01-1",
+      "submitted_at": "2026-09-08T08:00:00",
+      "original_free_text": "I vomited 2 times today and felt tired afterward.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "vomiting",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": 2,
+          "frequency_period": "today",
+          "original_phrase": "I vomited 2 times today",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": null,
+          "checkin_id": "demo-P002-01-1"
+        },
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "felt tired afterward",
+          "observed_date": null,
+          "observed_time_text": "afterward",
+          "notes": null,
+          "checkin_id": "demo-P002-01-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-02-1",
+      "submitted_at": "2026-09-09T08:00:00",
+      "original_free_text": "I vomited 3 times today and felt tired afterward.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "vomiting",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": 3,
+          "frequency_period": "today",
+          "original_phrase": "I vomited 3 times today",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": null,
+          "checkin_id": "demo-P002-02-1"
+        },
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "felt tired afterward",
+          "observed_date": null,
+          "observed_time_text": "afterward",
+          "notes": null,
+          "checkin_id": "demo-P002-02-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-03-1",
+      "submitted_at": "2026-09-10T08:00:00",
+      "original_free_text": "My mouth feels dry, especially when I wake up.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "dry_mouth",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "My mouth feels dry, especially when I wake up.",
+          "observed_date": null,
+          "observed_time_text": "when I wake up",
+          "notes": null,
+          "checkin_id": "demo-P002-03-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-04-1",
+      "submitted_at": "2026-09-11T08:00:00",
+      "original_free_text": "The inside of my cheek is sore. Cold water feels easier to sip.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "mouth_sores",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The inside of my cheek is sore.",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": "Could describe pain without a discrete lesion; clinician-independent wording review needed.",
+          "checkin_id": "demo-P002-04-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-05-1",
+      "submitted_at": "2026-09-12T08:00:00",
+      "original_free_text": "I woke up tired, and food tasted different at lunch.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "I woke up tired",
+          "observed_date": null,
+          "observed_time_text": "woke up",
+          "notes": null,
+          "checkin_id": "demo-P002-05-1"
+        },
+        {
+          "measure": "taste_changes",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "food tasted different at lunch.",
+          "observed_date": null,
+          "observed_time_text": "at lunch",
+          "notes": null,
+          "checkin_id": "demo-P002-05-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-08-1",
+      "submitted_at": "2026-09-15T08:00:00",
+      "original_free_text": "I vomited 2 times today and felt tired afterward.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "vomiting",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": 2,
+          "frequency_period": "today",
+          "original_phrase": "I vomited 2 times today",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": null,
+          "checkin_id": "demo-P002-08-1"
+        },
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "felt tired afterward",
+          "observed_date": null,
+          "observed_time_text": "afterward",
+          "notes": null,
+          "checkin_id": "demo-P002-08-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-12-1",
+      "submitted_at": "2026-09-19T08:00:00",
+      "original_free_text": "I haven't vomited today. My mouth feels dry.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "vomiting",
+          "status": "absent",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "I haven't vomited today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Negation is explicit; no literal numeric count.",
+          "checkin_id": "demo-P002-12-1"
+        },
+        {
+          "measure": "dry_mouth",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "My mouth feels dry.",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": null,
+          "checkin_id": "demo-P002-12-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P002-13-1",
+      "submitted_at": "2026-09-20T08:00:00",
+      "original_free_text": "Swallowing was uncomfortable this morning.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing was uncomfortable this morning.",
+          "observed_date": null,
+          "observed_time_text": "this morning",
+          "notes": "Discomfort during swallowing; no scale.",
+          "checkin_id": "demo-P002-13-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P003-04-1",
+      "submitted_at": "2026-09-12T08:00:00",
+      "original_free_text": "I started the medication my team mentioned. Swallowing is still uncomfortable.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Swallowing is still uncomfortable.",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": "Medication sentence is context; no causal claim.",
+          "checkin_id": "demo-P003-04-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P003-13-1",
+      "submitted_at": "2026-09-21T08:00:00",
+      "original_free_text": "My care team adjusted my pain medication today. My mouth still feels sore.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "pain",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "My mouth still feels sore.",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": "General soreness; medication adjustment is not an occurrence date.",
+          "checkin_id": "demo-P003-13-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P004-05-1",
+      "submitted_at": "2026-09-14T08:00:00",
+      "original_free_text": "I left a few questions blank. Mostly just tired today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Mostly just tired today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Blank questionnaire fields are unanswered.",
+          "checkin_id": "demo-P004-05-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P004-10-1",
+      "submitted_at": "2026-09-19T08:00:00",
+      "original_free_text": "I left a few questions blank. Mostly just tired today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Mostly just tired today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Blank questionnaire fields are unanswered.",
+          "checkin_id": "demo-P004-10-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P004-15-1",
+      "submitted_at": "2026-09-24T08:00:00",
+      "original_free_text": "I left a few questions blank. Mostly just tired today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "fatigue",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Mostly just tired today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Blank questionnaire fields are unanswered.",
+          "checkin_id": "demo-P004-15-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-06-1",
+      "submitted_at": "2026-09-16T08:00:00",
+      "original_free_text": "I think I felt dizzy by the sink this morning.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "dizziness",
+          "status": "uncertain",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "I think I felt dizzy by the sink this morning.",
+          "observed_date": null,
+          "observed_time_text": "this morning",
+          "notes": null,
+          "checkin_id": "demo-P005-06-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-06-2",
+      "submitted_at": "2026-09-16T20:00:00",
+      "original_free_text": "Still thinking about that same dizzy spell by the sink this morning.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "dizziness",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Still thinking about that same dizzy spell by the sink this morning.",
+          "observed_date": null,
+          "observed_time_text": "this morning",
+          "notes": "This quote asserts a recalled spell; likely refers to the earlier uncertain report. Verify status and linkage separately.",
+          "checkin_id": "demo-P005-06-2"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-10-1",
+      "submitted_at": "2026-09-20T08:00:00",
+      "original_free_text": "Earlier this week I felt off, maybe a little dizzy.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "dizziness",
+          "status": "uncertain",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "Earlier this week I felt off, maybe a little dizzy.",
+          "observed_date": null,
+          "observed_time_text": "Earlier this week",
+          "notes": null,
+          "checkin_id": "demo-P005-10-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-14-1",
+      "submitted_at": "2026-09-24T08:00:00",
+      "original_free_text": "I threw up twice this afternoon, even though I marked zero earlier.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own.",
+        "Questionnaire vomiting_count = 0; reporting window unknown."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "vomiting",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": 2,
+          "frequency_period": "this afternoon",
+          "original_phrase": "I threw up twice this afternoon",
+          "observed_date": null,
+          "observed_time_text": "this afternoon",
+          "notes": "Earlier zero has unknown form window; afternoon wording also conflicts with the recorded morning submission time. Do not resolve occurrence date.",
+          "checkin_id": "demo-P005-14-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-17-1",
+      "submitted_at": "2026-09-27T08:00:00",
+      "original_free_text": "I felt dizzy before breakfast today.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "dizziness",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "I felt dizzy before breakfast today.",
+          "observed_date": null,
+          "observed_time_text": "before breakfast today",
+          "notes": null,
+          "checkin_id": "demo-P005-17-1"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-17-2",
+      "submitted_at": "2026-09-27T20:00:00",
+      "original_free_text": "This evening I got dizzy again while folding laundry. The first spell was before breakfast.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "dizziness",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "This evening I got dizzy again while folding laundry.",
+          "observed_date": null,
+          "observed_time_text": "This evening",
+          "notes": null,
+          "checkin_id": "demo-P005-17-2"
+        },
+        {
+          "measure": "dizziness",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "The first spell was before breakfast.",
+          "observed_date": null,
+          "observed_time_text": "before breakfast",
+          "notes": "Anaphoric mention of the earlier dizziness; review link to morning report.",
+          "checkin_id": "demo-P005-17-2"
+        }
+      ]
+    },
+    {
+      "checkin_id": "demo-P005-21-1",
+      "submitted_at": "2026-10-01T08:00:00",
+      "original_free_text": "I haven't vomited today. My mouth feels dry.",
+      "context_notes": [
+        "At least one questionnaire field is null. Score text on its own."
+      ],
+      "verification_status": "verified",
+      "verified_by": "reviewer-03",
+      "mentions": [
+        {
+          "measure": "vomiting",
+          "status": "absent",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "I haven't vomited today.",
+          "observed_date": null,
+          "observed_time_text": "today",
+          "notes": "Negation is explicit; no literal numeric count.",
+          "checkin_id": "demo-P005-21-1"
+        },
+        {
+          "measure": "dry_mouth",
+          "status": "present",
+          "severity_score": null,
+          "frequency_count": null,
+          "frequency_period": null,
+          "original_phrase": "My mouth feels dry.",
+          "observed_date": null,
+          "observed_time_text": null,
+          "notes": null,
+          "checkin_id": "demo-P005-21-1"
+        }
+      ]
+    }
+  ],
+  "duplicate_pairs": [
+    {
+      "checkin_ids": [
+        "demo-P005-06-1",
+        "demo-P005-06-2"
+      ],
+      "measure": "dizziness",
+      "same_event": true,
+      "verification_status": "verified",
+      "verified_by": "reviewer-01",
+      "notes": "Explicit same morning spell reference."
+    },
+    {
+      "checkin_ids": [
+        "demo-P005-17-1",
+        "demo-P005-17-2"
+      ],
+      "measure": "dizziness",
+      "same_event": true,
+      "verification_status": "verified",
+      "verified_by": "reviewer-01",
+      "notes": "Morning reference only. The evening mention is distinct; pair label means the check-ins share at least one mention."
+    },
+    {
+      "checkin_ids": [
+        "demo-P005-06-1",
+        "demo-P005-17-1"
+      ],
+      "measure": "dizziness",
+      "same_event": false,
+      "verification_status": "verified",
+      "verified_by": "reviewer-01",
+      "notes": "Different dates with distinct morning reports."
+    }
+  ],
+  "reviewer_metadata": "Publication copy. Reviewer identifiers replaced with stable aliases; verification statuses and annotation content are intact."
+}

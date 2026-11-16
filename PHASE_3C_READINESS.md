@@ -1,0 +1,27 @@
+# Phase 3C-3 and 3C-4 readiness
+
+## Deduplication and idempotency
+
+- SQLite contains 1,460 symptom rows with 1,460 distinct observation IDs across 140 check-ins. All are questionnaire observations with unknown occurrence date and time. No `(checkin_id, measure, source_type)` key repeats. That composite uniqueness is a property of the current data. The schema enforces uniqueness on `observation_id`.
+- The read-only importer verification reconstructed each deterministic ID and matched every stored field against the eligible batch. Running the normal importer against an in-memory copy of the populated database skipped all 1,460 identical rows, inserted zero, and passed foreign-key checks. Existing tests exercise ID conflicts, transactional rollback, and held-group exclusion.
+- Repeated questionnaire submissions with different check-in IDs are separate answers. There are three patient/date pairs with two check-ins and two weights each. Keep those rows and choose the reporting grain explicitly.
+- `demo-P005-06-1` and `demo-P005-06-2` both answer dizziness as uncertain. The evening submission explicitly refers back to the same morning dizzy spell. Both are held and linked for duplicate review. Neither contributes a stored dizziness observation or a confirmed event. On `demo-P005-17-2`, the evening spell is described separately from the morning spell referenced in the text. Both check-ins' dizziness groups are held. Preserve that distinction in review.
+- All 177 unresolved groups remain in the reconciliation report. All 120 free-text agreements are in those held groups. Use a single provenance layer per aggregate. Joining raw answers to stored observations for coverage checks is useful, while unioning them as additive observations would repeat evidence from the same submission.
+
+## Analysis designs
+
+The submission date is the local calendar date in the stored ISO timestamp. Use `substr(submitted_at, 1, 10)` for this dataset. Keys and tie-breaks below apply to the current local timestamp convention.
+
+| Analysis | Recommended SQL design | Verified coverage and limits |
+| --- | --- | --- |
+| Pain severity by patient and submission date | Join `symptoms` to `checkins` by `checkin_id`, filter to questionnaire pain with passed validation, and show each reading ordered by `submitted_at, checkin_id`. For a daily snapshot, use `ROW_NUMBER()` per patient and submission date, ordered by timestamp descending and check-in ID descending. Define whether the snapshot is the latest submission or the latest available score. | The validated view has 88 scores and none for P001. A separately labeled raw-questionnaire view has 136 numeric scores and seven missing answers. Distinguish held observations from unanswered fields. |
+| Weekly vomiting report counts | Classify `checkins.raw_answers` with `json_type` and `json_extract`. Count positive integers, integer zero, the string uncertain, and absent keys or JSON null separately. Route unexpected values to an invalid bucket. Group by patient and Monday week start, computed with `date(submission_date, '-6 days', 'weekday 1')`. Keep the unit as submissions. | Raw coverage is seven positive, 128 zero, zero uncertain, and eight missing submissions. The stored view contains 125 zeros and no positives. Zero stored positives cannot establish a symptom-free week. Never sum questionnaire counts as confirmed weekly episodes. |
+| Weight trends | Group or plot by `weight.measured_date`. Keep each measurement with its weight ID. For one point per day, a daily mean with measurement count is deterministic. `measured_date` alone cannot identify the latest measurement. | 56 measurements across 53 patient-days. Three days have two measurements. |
+| Before and after treatment or medication | Anchor on a specific `event_id` and join check-ins by patient. For example, bucket submission dates at offsets −7 through −1 and +1 through +7 from the event date, leaving day zero separate. Use a left join for the selected observation and report submission and available-answer denominators. Keep windows per event to avoid pooling overlapping event windows as independent samples. | P003's September 21 medication adjustment has seven submissions in each window, with three stored pain scores before and seven after. This is a descriptive comparison with unequal coverage. Event dates and submission dates establish neither symptom timing nor treatment causality. |
+| Treatment-day analysis | Use `checkins.treatment_day` for reports and `treatments.treatment_day` for scheduled or recorded events. Aggregate at patient/day or retain each submission using the same tie-break policy. | Each patient covers days 1–28. Stored check-in and treatment days all match their dates relative to treatment start. A treatment-day index on a check-in describes the report date. |
+
+## Phase 4 scope
+
+Report-based questionnaire and weight views are feasible. Show coverage and provenance alongside symptom trends, especially where validated-only selections systematically omit a patient or response category. Confirmed episode counts, occurrence-date trends, and causal analysis are blocked by unknown questionnaire reporting windows, unresolved free-text evidence, or the observational design.
+
+The complete suite passed all 35 tests. The database file hash matched before and after the readiness queries and repeat-import test. The audit created no database rows, merged no observations, and left the schema and source data intact.

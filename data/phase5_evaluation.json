@@ -1,0 +1,347 @@
+{
+  "sample": {
+    "checkins": 36,
+    "distinct_reports": 31,
+    "reference_mentions": 45,
+    "verified_checkins": 36
+  },
+  "reference_status": "verified",
+  "saved_llm": {
+    "model": "qwen2.5:3b",
+    "sample_failed_checkin_ids": [
+      "demo-P002-01-1",
+      "demo-P002-08-1",
+      "demo-P004-05-1",
+      "demo-P004-10-1",
+      "demo-P004-15-1",
+      "demo-P005-06-1",
+      "demo-P005-17-2"
+    ],
+    "sample_partial_checkin_ids": [
+      "demo-P001-03-1",
+      "demo-P001-05-1",
+      "demo-P001-10-1",
+      "demo-P001-16-1",
+      "demo-P001-17-1",
+      "demo-P001-25-1",
+      "demo-P001-26-1",
+      "demo-P002-02-1",
+      "demo-P002-03-1",
+      "demo-P002-04-1",
+      "demo-P002-12-1",
+      "demo-P002-13-1",
+      "demo-P003-04-1",
+      "demo-P005-17-1",
+      "demo-P005-21-1"
+    ]
+  },
+  "saved_candidate_counts_in_sample": {
+    "keyword": 43,
+    "llm": 28
+  },
+  "parser_accuracy": {
+    "keyword": {
+      "detection": {
+        "tp": 43,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.9555555555555556,
+        "f1": 0.9772727272727273
+      },
+      "detection_plus_status": {
+        "tp": 43,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.9555555555555556,
+        "f1": 0.9772727272727273
+      },
+      "status_on_detection_matches": {
+        "accuracy": 1.0,
+        "confusion": [
+          {
+            "reference": "absent",
+            "prediction": "absent",
+            "count": 2
+          },
+          {
+            "reference": "present",
+            "prediction": "present",
+            "count": 39
+          },
+          {
+            "reference": "uncertain",
+            "prediction": "uncertain",
+            "count": 2
+          }
+        ]
+      },
+      "fields_on_detection_matches": {
+        "severity": {
+          "correct": 43,
+          "matched": 43,
+          "accuracy": 1.0,
+          "supported_correct": 8,
+          "supported": 8,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "frequency": {
+          "correct": 39,
+          "matched": 43,
+          "accuracy": 0.9069767441860465,
+          "supported_correct": 0,
+          "supported": 4,
+          "accuracy_on_supported_reference": 0.0
+        },
+        "frequency_count": {
+          "correct": 43,
+          "matched": 43,
+          "accuracy": 1.0,
+          "supported_correct": 4,
+          "supported": 4,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "frequency_period": {
+          "correct": 39,
+          "matched": 43,
+          "accuracy": 0.9069767441860465,
+          "supported_correct": 0,
+          "supported": 4,
+          "accuracy_on_supported_reference": 0.0
+        },
+        "negation": {
+          "correct": 43,
+          "matched": 43,
+          "accuracy": 1.0,
+          "supported_correct": 2,
+          "supported": 2,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "uncertainty": {
+          "correct": 43,
+          "matched": 43,
+          "accuracy": 1.0,
+          "supported_correct": 2,
+          "supported": 2,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "temporal_evidence": {
+          "correct": 37,
+          "matched": 43,
+          "accuracy": 0.8604651162790697,
+          "supported_correct": 30,
+          "supported": 36,
+          "accuracy_on_supported_reference": 0.8333333333333334
+        }
+      },
+      "failed_checkin_ids": [],
+      "reference_mentions_in_failed_checkins": 0,
+      "partial_checkin_ids": []
+    },
+    "llm": {
+      "detection": {
+        "tp": 28,
+        "fp": 0,
+        "fn": 17,
+        "precision": 1.0,
+        "recall": 0.6222222222222222,
+        "f1": 0.7671232876712328
+      },
+      "detection_plus_status": {
+        "tp": 28,
+        "fp": 0,
+        "fn": 17,
+        "precision": 1.0,
+        "recall": 0.6222222222222222,
+        "f1": 0.7671232876712328
+      },
+      "status_on_detection_matches": {
+        "accuracy": 1.0,
+        "confusion": [
+          {
+            "reference": "present",
+            "prediction": "present",
+            "count": 28
+          }
+        ]
+      },
+      "fields_on_detection_matches": {
+        "severity": {
+          "correct": 21,
+          "matched": 28,
+          "accuracy": 0.75,
+          "supported_correct": 8,
+          "supported": 8,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "frequency": {
+          "correct": 28,
+          "matched": 28,
+          "accuracy": 1.0,
+          "supported_correct": 2,
+          "supported": 2,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "frequency_count": {
+          "correct": 28,
+          "matched": 28,
+          "accuracy": 1.0,
+          "supported_correct": 2,
+          "supported": 2,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "frequency_period": {
+          "correct": 28,
+          "matched": 28,
+          "accuracy": 1.0,
+          "supported_correct": 2,
+          "supported": 2,
+          "accuracy_on_supported_reference": 1.0
+        },
+        "negation": {
+          "correct": 28,
+          "matched": 28,
+          "accuracy": 1.0,
+          "supported_correct": 0,
+          "supported": 0,
+          "accuracy_on_supported_reference": null
+        },
+        "uncertainty": {
+          "correct": 28,
+          "matched": 28,
+          "accuracy": 1.0,
+          "supported_correct": 0,
+          "supported": 0,
+          "accuracy_on_supported_reference": null
+        },
+        "temporal_evidence": {
+          "correct": 19,
+          "matched": 28,
+          "accuracy": 0.6785714285714286,
+          "supported_correct": 16,
+          "supported": 22,
+          "accuracy_on_supported_reference": 0.7272727272727273
+        }
+      },
+      "failed_checkin_ids": [
+        "demo-P002-01-1",
+        "demo-P002-08-1",
+        "demo-P004-05-1",
+        "demo-P004-10-1",
+        "demo-P004-15-1",
+        "demo-P005-06-1",
+        "demo-P005-17-2"
+      ],
+      "reference_mentions_in_failed_checkins": 10,
+      "partial_checkin_ids": [
+        "demo-P001-03-1",
+        "demo-P001-05-1",
+        "demo-P001-10-1",
+        "demo-P001-16-1",
+        "demo-P001-17-1",
+        "demo-P001-25-1",
+        "demo-P001-26-1",
+        "demo-P002-02-1",
+        "demo-P002-03-1",
+        "demo-P002-04-1",
+        "demo-P002-12-1",
+        "demo-P002-13-1",
+        "demo-P003-04-1",
+        "demo-P005-17-1",
+        "demo-P005-21-1"
+      ]
+    }
+  },
+  "reconciliation": {
+    "full_run": {
+      "groups": 1637,
+      "text_groups": 177,
+      "agreements": 120,
+      "agreement_rate_among_text_groups": 0.6779661016949152,
+      "groups_requiring_review": 177,
+      "review_rate_all_groups": 0.10812461820403177,
+      "review_rate_text_groups": 1.0,
+      "review_reasons_overlapping": {
+        "questionnaire_time_unknown": 177,
+        "unsupported_evidence": 126,
+        "llm_unavailable": 52,
+        "one_parser_only": 5,
+        "possible_duplicate": 2
+      },
+      "groups_with_possible_duplicate_links": 2,
+      "groups_with_distinct_occurrence_links": 1,
+      "rejected_observations_across_saved_attempts": 61,
+      "human_reviewed_groups": 0,
+      "confirmed_clinical_events": null
+    },
+    "sample": {
+      "groups": 382,
+      "text_groups": 42,
+      "agreements": 33,
+      "agreement_rate_among_text_groups": 0.7857142857142857,
+      "groups_requiring_review": 42,
+      "review_rate_all_groups": 0.1099476439790576,
+      "review_rate_text_groups": 1.0,
+      "review_reasons_overlapping": {
+        "questionnaire_time_unknown": 42,
+        "unsupported_evidence": 25,
+        "llm_unavailable": 4,
+        "one_parser_only": 5,
+        "possible_duplicate": 2
+      },
+      "groups_with_possible_duplicate_links": 2,
+      "groups_with_distinct_occurrence_links": 1,
+      "rejected_observations_across_saved_attempts": 12,
+      "human_reviewed_groups": 0,
+      "confirmed_clinical_events": null
+    },
+    "agreement_correctness": {
+      "status": "computed",
+      "agreements": 33,
+      "correct_measure_and_status": 33,
+      "exact_scored_claims": 26,
+      "measure_status_accuracy": 1.0,
+      "exact_scored_claim_accuracy": 0.7878787878787878
+    },
+    "duplicate_pair_detection": {
+      "status": "computed",
+      "labeled_pairs": 3,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666
+    }
+  },
+  "integrity": {
+    "status": "passed",
+    "stored_observations": 1460,
+    "foreign_key_check": "passed",
+    "held_groups_absent_from_sqlite": true,
+    "explicit_zero_scores": 48,
+    "explicit_zero_counts": 125,
+    "stored_uncertain_observations": 0,
+    "null_severity_scores": 1020,
+    "dashboard_read_only": true,
+    "patient_filter_and_layer_separation": "passed",
+    "weekly_raw_vomiting": {
+      "positive": 7,
+      "explicit_zero": 128,
+      "uncertain": 0,
+      "missing": 8,
+      "submissions": 143
+    },
+    "adjustment_window_coverage": [
+      7,
+      7,
+      3,
+      7
+    ],
+    "p005_weights": {
+      "measurements": 14,
+      "displayed_days": 12
+    }
+  }
+}

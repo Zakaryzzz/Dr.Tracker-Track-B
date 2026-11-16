@@ -1,0 +1,43 @@
+# Local Python environments and tooling
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Databases and SQLite sidecars
+*.db
+!/data/drtracker.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Local state, logs, and scratch copies
+/data/phase5_reference_reviewed.json
+/phase5_reference_verified.json
+/data/phase5_reference_verified.json
+/reproduced-evaluation.json
+/.phase6a-check-*/
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
