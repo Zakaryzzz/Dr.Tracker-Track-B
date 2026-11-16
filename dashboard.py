@@ -11,6 +11,7 @@ from src.analysis import (
     open_readonly, pain_trend, patients, treatment_windows, weekly_vomiting,
 )
 from src.database import DATABASE_PATH
+from src.schema_page import show_schema
 
 REPORT_PATH = DATABASE_PATH.with_name("phase3c1_reconciliation.json")
 
@@ -141,8 +142,7 @@ def show_saved_extraction(db):
             st.write(", ".join(example["review_reasons"]))
 
 
-def main():
-    st.set_page_config(page_title="Dr.Tracker · Patient reports", page_icon="◈", layout="wide")
+def show_dashboard():
     st.title("Dr.Tracker")
     st.caption("Track B · Synthetic patient-reported data")
     if not DATABASE_PATH.is_file() or not REPORT_PATH.is_file():
@@ -183,6 +183,15 @@ def main():
         show_treatment_changes(db, patient_id)
         show_coverage(stats)
         show_saved_extraction(db)
+
+
+def main():
+    st.set_page_config(page_title="Dr.Tracker", page_icon="◈", layout="wide")
+    page = st.navigation([
+        st.Page(show_dashboard, title="Patient Dashboard", default=True),
+        st.Page(show_schema, title="Relational Schema", url_path="schema"),
+    ])
+    page.run()
 
 
 if __name__ == "__main__":
