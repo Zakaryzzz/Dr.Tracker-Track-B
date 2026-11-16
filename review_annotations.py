@@ -49,7 +49,7 @@ def editor_rows(frame):
     return rows
 
 
-def review_case(cases, reviewer):
+def review_case(cases, reviewer, *, read_only=False):
     st.subheader("Check-in review")
     indices = list(range(len(cases)))
     first_pending = next((i for i in indices if not verified(cases[i])), 0)
@@ -60,6 +60,12 @@ def review_case(cases, reviewer):
     show_report(case)
     if verified(case):
         st.success(f"Verified by {case['verified_by']}")
+    if read_only:
+        if case["mentions"]:
+            st.dataframe(pd.DataFrame(case["mentions"], columns=EDIT_FIELDS), hide_index=True)
+        else:
+            st.info("No symptom mentions in the verified reference for this report.")
+        return
     st.caption("Copy evidence verbatim from the report. Leave unsupported numbers and dates blank. "
                "Use the table controls to add or remove mentions.")
     frame = pd.DataFrame(case["mentions"], columns=EDIT_FIELDS)
@@ -99,7 +105,7 @@ def review_case(cases, reviewer):
             st.error(str(error))
 
 
-def review_pairs(pairs, cases, reviewer):
+def review_pairs(pairs, cases, reviewer, *, read_only=False):
     st.subheader("Duplicate-event review")
     if not pairs:
         st.info("There are no duplicate-event pairs in this sample.")
@@ -114,6 +120,14 @@ def review_pairs(pairs, cases, reviewer):
     for column, key in zip(st.columns(2), pair["checkin_ids"]):
         with column:
             show_report(case_by_id[key])
+    if read_only:
+        label = next(name for name, value in PAIR_DECISIONS.items() if value is pair["same_event"])
+        st.write(f"Relationship · {label}")
+        if verified(pair):
+            st.success(f"Verified by {pair['verified_by']}")
+        if pair.get("notes"):
+            st.write(pair["notes"])
+        return
     st.caption("Choose shared occurrence if the reports share at least one occurrence. "
                "Record any additional distinct occurrence in the notes.")
     options = list(PAIR_DECISIONS)
@@ -135,12 +149,12 @@ def review_pairs(pairs, cases, reviewer):
             st.error(str(error))
 
 
-def main():
-    st.set_page_config(page_title="Dr.Tracker · Annotation review", layout="wide")
+def show_review(*, read_only=False):
     st.title("Annotation review")
     st.caption("Dr.Tracker · Phase 5 · Synthetic patient reports")
     try:
-        review = load_review()
+        review = (json.loads(PROGRESS_PATH.with_name("phase5_reference_verified_demo.json")
+                             .read_text(encoding="utf-8")) if read_only else load_review())
         with closing(open_readonly()) as db:
             reports = {key: (text, timestamp) for key, text, timestamp in db.execute(
                 "SELECT checkin_id, free_text, submitted_at FROM checkins"
@@ -153,6 +167,15 @@ def main():
     completed = sum(verified(case) for case in cases)
     completed_pairs = sum(verified(pair) for pair in pairs)
     st.progress(completed / len(cases), text=f"{completed}/{len(cases)} check-ins verified")
+    if read_only:
+        st.caption(f"{completed_pairs}/{len(pairs)} duplicate-event pairs verified · Read-only demo")
+        st.caption("These verified labels are used for extraction evaluation. Operational reconciliation is separate.")
+        view = st.radio("Review", ("Check-ins", "Duplicate pairs"), horizontal=True)
+        if view == "Check-ins":
+            review_case(cases, "", read_only=True)
+        else:
+            review_pairs(pairs, cases, "", read_only=True)
+        return
     st.caption(f"{completed_pairs}/{len(pairs)} duplicate-event pairs verified · Progress saves to {PROGRESS_PATH.name}")
     if message := st.session_state.pop("review_saved", None):
         st.success(message)
@@ -167,6 +190,15 @@ def main():
             st.info("Some duplicate pairs are incomplete. Duplicate detection metrics remain pending.")
         st.download_button("Export reviewed reference", export_reference(review, reports),
                            file_name="phase5_reference_verified.json", mime="application/json")
+
+
+def show_review_demo():
+    show_review(read_only=True)
+
+
+def main():
+    st.set_page_config(page_title="Dr.Tracker · Annotation review", layout="wide")
+    show_review()
 
 
 if __name__ == "__main__":

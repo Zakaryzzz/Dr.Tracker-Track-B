@@ -12,6 +12,7 @@ from src.analysis import (
 )
 from src.database import DATABASE_PATH
 from src.schema_page import show_schema
+from review_annotations import show_review_demo
 
 REPORT_PATH = DATABASE_PATH.with_name("phase3c1_reconciliation.json")
 
@@ -190,6 +191,7 @@ def main():
     page = st.navigation([
         st.Page(show_dashboard, title="Patient Dashboard", default=True),
         st.Page(show_schema, title="Relational Schema", url_path="schema"),
+        st.Page(show_review_demo, title="Annotation Review", url_path="annotation-review"),
     ])
     page.run()
 
