@@ -94,3 +94,11 @@ To rebuild deterministic questionnaire and keyword candidates from SQLite, run `
 Publish source, schema, tests, documentation, and the synthetic JSON assets. Include the rebuilt `data/drtracker.db` demo snapshot with its matching Phase 3C-1 report. The saved keyword and LLM exports, draft reference, and aliased verified demo reference support offline replay and evaluation. Keep other SQLite files, virtual environments, reviewer progress and downloads, caches, and credentials local.
 
 Future work includes reviewing the unresolved groups, documenting questionnaire reporting windows, and evaluating more varied reports. This prototype supports report analysis rather than clinical diagnosis, confirmed episode counts, or causal claims.
+
+## Patient reporting workspace
+
+The patient page provides an overview, a deterministic change summary, selectable multi-symptom severity trends, weekly raw vomiting reports, a medication timeline, and recent statements with saved extraction provenance. The source selector applies to score summaries and severity trends. Vomiting frequency always uses raw submissions and labels count sums explicitly. Nausea severity is displayed as not collected because this questionnaire has no nausea field.
+
+The trend badge compares daily scores in the latest seven submission dates against the previous seven. Each symptom needs at least three numeric scores per window. The largest absolute mean change determines the badge; changes smaller than one point are stable. This is a display rule. Latest submission per date wins, preserving missing values. The change summary uses the latest report on or before the most recent earlier follow-up as a baseline, falling back explicitly to the previous submission. Relative time and medication-effect interpretation still require review.
+
+Severity gaps appear as breaks and crosses below the scoring axis. Medication events share the date axis and have hover details. Weight measurements remain accessible in an expandable panel. No data is written when browsing this page.
