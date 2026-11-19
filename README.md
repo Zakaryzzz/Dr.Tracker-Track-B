@@ -68,7 +68,7 @@ The seed module creates 143 check-ins, 56 weights, and 116 treatment events for 
 .\.venv\Scripts\python.exe -m streamlit run review_annotations.py --server.address 127.0.0.1 --server.port 8502
 ```
 
-The dashboard separates raw and validated pain trends, groups weekly raw vomiting responses, selects the latest submitted valid weight per measurement date, and compares scores in submission-date windows around treatment changes. P001 has raw pain scores and no validated pain scores. All seven positive vomiting responses are outside the validated subset. Questionnaire reporting windows are unknown, so submission dates describe reporting and weekly counts describe responses. Treatment comparisons are descriptive.
+The physician dashboard displays original questionnaire scores, groups weekly vomiting submissions, selects the latest submitted valid weight per measurement date, and compares questionnaire scores in submission-date windows around treatment changes. P001 has raw pain scores and no validated pain scores. All seven positive vomiting responses are outside the validated subset. Questionnaire reporting windows are unknown, so submission dates describe reporting and weekly counts describe responses. Treatment comparisons are descriptive.
 
 ## Evaluate saved outputs
 
@@ -95,10 +95,10 @@ Publish source, schema, tests, documentation, and the synthetic JSON assets. Inc
 
 Future work includes reviewing the unresolved groups, documenting questionnaire reporting windows, and evaluating more varied reports. This prototype supports report analysis rather than clinical diagnosis, confirmed episode counts, or causal claims.
 
-## Patient reporting workspace
+## Physician review workspace
 
-The patient page provides an overview, a deterministic change summary, selectable multi-symptom severity trends, weekly raw vomiting reports, a medication timeline, and recent statements with saved extraction provenance. The source selector applies to score summaries and severity trends. Vomiting frequency always uses raw submissions and labels count sums explicitly. Nausea severity is displayed as not collected because this questionnaire has no nausea field.
+The patient dashboard uses original questionnaire answers for all scores and summaries under Patient-reported symptoms. Zero, missing, and uncertain remain distinct. No source selection is needed. Weekly vomiting count sums retain the unknown-period label. Medication comparisons in the expandable panel also use original questionnaire scores. The validated layer remains available through the analysis API for the existing integrity and evaluation workflow.
 
-The trend badge compares daily scores in the latest seven submission dates against the previous seven. Each symptom needs at least three numeric scores per window. The largest absolute mean change determines the badge; changes smaller than one point are stable. This is a display rule. Latest submission per date wins, preserving missing values. The change summary uses the latest report on or before the most recent earlier follow-up as a baseline, falling back explicitly to the previous submission. Relative time and medication-effect interpretation still require review.
+Reports to Clarify sits beside the symptom chart. It shows exact original text when saved extraction records contain failed attempts, rejected candidates or fields, uncertain or unmatched text, differing answers, potential repeats, or wording outside quoted evidence spans. Entries are deduplicated by check-in ID and paginated four at a time. Span coverage is a triage cue: uncovered words may be context, and a full-length quote cannot guarantee every symptom was extracted. Questionnaire/text differences with unknown periods are labeled timing unknown, not confirmed clinical conflicts.
 
-Severity gaps appear as breaks and crosses below the scoring axis. Medication events share the date axis and have hover details. Weight measurements remain accessible in an expandable panel. No data is written when browsing this page.
+Recent Patient Reports displays questionnaire answers and original statements. Detailed parser provenance and review reasons are expandable. No model requests or database writes occur during browsing. The schema and public annotation-review menu pages remain available.

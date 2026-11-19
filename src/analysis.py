@@ -130,8 +130,23 @@ def weekly_vomiting(db, patient_id):
     return records(db, WEEKLY_VOMITING, (patient_id,))
 
 
-def treatment_windows(db, patient_id):
-    return records(db, TREATMENT_WINDOWS, {"patient": patient_id, "minimum": MIN_WINDOW_SCORES})
+def treatment_windows(db, patient_id, layer=VALIDATED):
+    if layer not in (RAW, VALIDATED):
+        raise ValueError("Unknown observation layer")
+    query = TREATMENT_WINDOWS
+    if layer == RAW:
+        raw_scores = """
+            SELECT c.checkin_id, m.measure,
+                   CASE WHEN json_type(c.raw_answers, '$.' || m.measure || '_score') = 'integer'
+                          AND json_extract(c.raw_answers, '$.' || m.measure || '_score') BETWEEN 0 AND 10
+                        THEN json_extract(c.raw_answers, '$.' || m.measure || '_score') END AS score
+            FROM checkins c
+            CROSS JOIN (SELECT 'pain' AS measure UNION ALL SELECT 'dizziness'
+                        UNION ALL SELECT 'fatigue' UNION ALL SELECT 'dry_mouth') m
+            WHERE c.patient_id = :patient
+        """
+        query = query.replace(VALIDATED_SCORES, raw_scores)
+    return records(db, query, {"patient": patient_id, "minimum": MIN_WINDOW_SCORES})
 
 
 def daily_weight(db, patient_id):

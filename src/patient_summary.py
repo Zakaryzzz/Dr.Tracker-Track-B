@@ -1,12 +1,91 @@
 """Patient-scoped reporting summaries used by the clinical dashboard."""
 import json
+import re
+from collections import defaultdict
 from datetime import date, timedelta
 from statistics import mean
 
 from .analysis import RAW, VALIDATED, VALIDATED_SCORES, records
-from .extract_symptoms import FLAGS, SCORES
+from .extract_symptoms import FLAGS, SCORES, map_questionnaire
 
 LABELS = {"pain": "Pain", "dizziness": "Dizziness", "fatigue": "Fatigue", "dry_mouth": "Dry mouth"}
+
+
+def reports_to_clarify(reports, groups, keyword, llm, audit):
+    """Select patient reports from saved extraction evidence without claiming full coverage."""
+    by_id = defaultdict(list)
+    for group in groups:
+        by_id[group["checkin_id"]].append(group)
+    saved = defaultdict(list)
+    for candidate in [*keyword, *llm.get("candidates", [])]:
+        saved[candidate["checkin_id"]].append(candidate)
+    result = []
+    for report in sorted(reports, key=lambda r: (r["submitted_at"], r["checkin_id"]), reverse=True):
+        text, key = report.get("free_text"), report["checkin_id"]
+        if not text or not text.strip():
+            continue
+        reasons, details = set(), []
+        candidates = list(saved[key])
+        answers = {row["measure"]: row for row in map_questionnaire(key, report["raw_answers"])}
+        for group in by_id[key]:
+            for source in ("keyword", "llm"):
+                candidates.extend(group["evidence"].get(source, []))
+            codes = set(group.get("review_reasons", []))
+            if codes.intersection({"parser_claim_mismatch"}):
+                reasons.add("Conflicting extractions")
+            if codes.intersection({"one_parser_only", "llm_unavailable", "temporal_ambiguity"}):
+                reasons.add("Unmatched evidence")
+            if "possible_duplicate" in codes:
+                reasons.add("Possible repeat")
+            if "unsupported_evidence" in codes or group["evidence"].get("rejected_llm_observations"):
+                reasons.add("Extraction needs checking")
+            details.extend(group.get("review_reasons", []))
+        if not candidates:
+            reasons.add("Unclassified")
+        if key in llm.get("errors", {}) or key in llm.get("initial_validation_errors", {}):
+            reasons.add("Extraction failed")
+            details.append(llm.get("errors", {}).get(key) or llm["initial_validation_errors"][key])
+        for attempt in audit.get(key, {}).get("attempts", {}).values():
+            if attempt.get("rejected"):
+                reasons.add("Extraction needs checking")
+                details.extend(row["reason"] for row in attempt["rejected"])
+            candidates.extend(attempt.get("valid", []))
+        for candidate in candidates:
+            if candidate.get("rejected_fields"):
+                reasons.add("Extraction needs checking")
+                details.extend(f"{field}: {item['reason']}" for field, item in candidate["rejected_fields"].items())
+            if candidate.get("status") == "uncertain":
+                reasons.add("Uncertain")
+            answer = answers.get(candidate.get("measure"))
+            if answer:
+                disagreement = answer["status"] != candidate.get("status") or any(
+                    answer.get(field) is not None and candidate.get(field) is not None
+                    and answer[field] != candidate[field] for field in ("severity_score", "frequency_count")
+                )
+                if disagreement:
+                    reasons.add("Different answers · timing unknown")
+        # Literal span coverage is a triage cue only. Uncovered wording may
+        # be context, an unrecognized symptom, or an anaphoric reference.
+        covered = [False] * len(text)
+        for candidate in candidates:
+            phrase = candidate.get("original_phrase")
+            if not isinstance(phrase, str) or not phrase:
+                continue
+            start = text.find(phrase)
+            while start >= 0:
+                covered[start:start + len(phrase)] = [True] * len(phrase)
+                start = text.find(phrase, start + len(phrase))
+        remainder = "".join(" " if covered[i] else char for i, char in enumerate(text))
+        words = re.findall(r"\w+", remainder.lower())
+        if any(word not in {"and", "but", "or", "i", "my", "the", "a", "an"} for word in words):
+            reasons.add("Coverage unconfirmed")
+        if reasons:
+            result.append({
+                "checkin_id": key, "submitted_at": report["submitted_at"],
+                "free_text": text, "reasons": sorted(reasons), "details": sorted(set(details)),
+            })
+    # Reports are source submissions. Repeated input rows cannot duplicate a card.
+    return list({row["checkin_id"]: row for row in result}.values())
 
 
 def numeric(value):
