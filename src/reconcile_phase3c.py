@@ -6,6 +6,7 @@ from contextlib import closing
 from uuid import NAMESPACE_URL, uuid5
 
 from .database import DATABASE_PATH, connect
+from .identifiers import identifier, legacy_checkin, load_artifact
 from .extract_symptoms import map_questionnaire, parse_keywords
 from .llm_extraction import unique_fields, validate_response
 from .reconcile_symptoms import (
@@ -105,8 +106,8 @@ def observation(row, kind, report=None):
               "original_phrase", "source_type", "extraction_method")
     result = {field: row.get(field) for field in fields}
     span = source_span(report, row.get("original_phrase")) if report is not None else None
-    key = json.dumps([row["checkin_id"], measure_of(row), kind, span], separators=(",", ":"))
-    result.update(observation_id=str(uuid5(NAMESPACE_URL, "drtracker:" + key)),
+    key = json.dumps([legacy_checkin(row["checkin_id"]), measure_of(row), kind, span], separators=(",", ":"))
+    result.update(observation_id=identifier("symptoms", str(uuid5(NAMESPACE_URL, "drtracker:" + key))),
                   observation_type=kind, evidence_span=span)
     return result
 
@@ -205,7 +206,7 @@ def link_checkins(groups, checkins):
 
 def main():
     def load(name):
-        return json.loads(DATABASE_PATH.with_name(name).read_text(encoding="utf-8"))
+        return load_artifact(DATABASE_PATH.with_name(name))
 
     with closing(connect(DATABASE_PATH.as_uri() + "?mode=ro", uri=True)) as connection:
         checkins = {key: (patient, submitted, report or "", raw)

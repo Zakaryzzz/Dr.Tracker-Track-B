@@ -44,11 +44,14 @@ def connect(path=DATABASE_PATH, *, uri=False):
 
 def apply_schema(connection):
     if sqlite3.sqlite_version_info < (3, 37, 0):
-        raise RuntimeError("SQLite 3.37 or newer is required for STRICT tables.")
+        raise RuntimeError("SQLite 3.37 or newer is required by this project.")
     try:
         connection.execute("SELECT json_valid('{}')").fetchone()
     except sqlite3.OperationalError as error:
         raise RuntimeError("This SQLite build must provide json_valid().") from error
+    existing = {row[1]: row[2] for row in connection.execute("PRAGMA table_info(patients)")}
+    if existing and (existing.get("patient_id") != "INTEGER" or existing.get("date_of_birth") != "DATE"):
+        raise RuntimeError("Legacy database detected. Run python -m src.migrate_schema first.")
     connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
@@ -90,13 +93,13 @@ def verify_schema():
 
         connection.executemany(
             "INSERT INTO patients VALUES (?, 'Test', '1980-01-01', 'Test', '2026-01-01', NULL)",
-            [("p1",), ("p2",)],
+            [(1,), (2,)],
         )
         insert_checkin = """
             INSERT INTO checkins (checkin_id, patient_id, submitted_at, raw_answers)
             VALUES (?, ?, '2026-01-01T12:00:00', ?)
         """
-        connection.executemany(insert_checkin, [("c1", "p1", "{}"), ("c2", "p1", "{}")])
+        connection.executemany(insert_checkin, [(11, 1, "{}"), (12, 1, "{}")])
         require(connection.execute("SELECT count(*) FROM checkins").fetchone() == (2,),
                 "Same-day check-ins")
         print("PASS: multiple same-day check-ins")
@@ -105,24 +108,24 @@ def verify_schema():
             INSERT INTO symptoms (
                 observation_id, checkin_id, measure, status, severity_score,
                 source_type, extraction_method, review_status, validation_status
-            ) VALUES ('s1', 'c1', 'test', 'uncertain', ?, 'questionnaire',
+            ) VALUES (31, 11, 'test', 'uncertain', ?, 'questionnaire',
                       'questionnaire', 'pending', 'pending')
         """
         for severity in (-1, 11):
             expect_rejection(connection, f"Severity {severity}", insert_symptom,
                              (severity,), "SQLITE_CONSTRAINT_CHECK")
-        insert_weight = "INSERT INTO weight VALUES ('w1', ?, 'c1', '2026-01-01', ?)"
+        insert_weight = "INSERT INTO weight VALUES (21, ?, 11, '2026-01-01', ?)"
         expect_rejection(connection, "Negative weight", insert_weight,
-                         ("p1", -1), "SQLITE_CONSTRAINT_CHECK")
+                         (1, -1), "SQLITE_CONSTRAINT_CHECK")
         expect_rejection(connection, "Invalid JSON", insert_checkin,
-                         ("c3", "p1", "{"), "SQLITE_CONSTRAINT_CHECK")
+                         (13, 1, "{"), "SQLITE_CONSTRAINT_CHECK")
         expect_rejection(connection, "Missing patient reference", insert_checkin,
-                         ("c3", "missing", "{}"), "SQLITE_CONSTRAINT_FOREIGNKEY")
+                         (13, 999, "{}"), "SQLITE_CONSTRAINT_FOREIGNKEY")
         expect_rejection(connection, "Weight check-in belongs to another patient",
-                         insert_weight, ("p2", 150), "SQLITE_CONSTRAINT_FOREIGNKEY")
+                         insert_weight, (2, 150), "SQLITE_CONSTRAINT_FOREIGNKEY")
         expect_rejection(
             connection, "Treatment check-in belongs to another patient",
-            "INSERT INTO treatments VALUES ('e1', 'p2', 'c1', '2026-01-01', 1, 'test', 'test', 'test')",
+            "INSERT INTO treatments VALUES (41, 2, 11, '2026-01-01', 1, 'test', 'test', 'test')",
             (), "SQLITE_CONSTRAINT_FOREIGNKEY",
         )
         connection.commit()

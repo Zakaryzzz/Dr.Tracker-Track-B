@@ -5,6 +5,7 @@ import sqlite3
 from contextlib import closing
 
 from .database import DATABASE_PATH, connect
+from .identifiers import load_artifact
 from .extract_symptoms import map_questionnaire
 from .reconcile_phase3c import observation
 
@@ -132,7 +133,7 @@ def main():
     args = parser.parse_args()
     mode = "dry-run" if args.dry_run else "verify" if args.verify else "insert"
     try:
-        report = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
+        report = load_artifact(REPORT_PATH)
         uri = DATABASE_PATH.as_uri() + ("?mode=rw" if mode == "insert" else "?mode=ro")
         with closing(connect(uri, uri=True)) as connection:
             result = process(connection, report, mode, expected_count=1460)

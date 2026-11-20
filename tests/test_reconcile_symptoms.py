@@ -1,3 +1,4 @@
+from src.identifiers import identifier
 import json
 import unittest
 from contextlib import closing
@@ -142,7 +143,7 @@ class Phase3BTests(unittest.TestCase):
                 "SELECT checkin_id, free_text FROM checkins ORDER BY checkin_id LIMIT 3"
             ).fetchall()
         for index, (key, report) in enumerate(reports, 1):
-            self.assertEqual(key, f"demo-P001-{index:02d}-1")
+            self.assertEqual(key, identifier("checkins", f"demo-P001-{index:02d}-1"))
             with self.subTest(checkin=key):
                 fields = dict(measure="pain", original_phrase=report,
                               pain_location="throat" if index < 3 else "back of my throat",

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .analysis import RAW, VALIDATED, daily_weight, open_readonly, pain_trend, treatment_windows, weekly_vomiting
 from .database import DATABASE_PATH, connect
+from .identifiers import identifier, load_artifact
 from .extract_symptoms import PATTERNS
 from .insert_symptoms import process
 from .llm_extraction import STATUSES
@@ -19,7 +20,7 @@ DEFAULT_REFERENCE = DATA / "phase5_reference_draft.json"
 
 
 def load(path):
-    return json.loads(path.read_text(encoding="utf-8"))
+    return load_artifact(path)
 
 
 def verified(item):
@@ -261,17 +262,20 @@ def integrity(db, reconciliation):
                if g["review_status"] == "needs_review"):
             raise ValueError("A held group was inserted")
         raw_pain, validated_pain = [
-            pain_trend(db, "P001", layer) for layer in (RAW, VALIDATED)
+            pain_trend(db, identifier("patients", "P001"), layer) for layer in (RAW, VALIDATED)
         ]
         totals = Counter()
         for patient, in db.execute("SELECT patient_id FROM patients"):
             for row in weekly_vomiting(db, patient):
                 totals.update({key: row[key] for key in ("positive", "explicit_zero", "uncertain", "missing", "submissions")})
-        adjusted = next(row for row in treatment_windows(db, "P003")
+        adjusted = next(row for row in treatment_windows(db, identifier("patients", "P003"))
                         if row["measure"] == "pain" and row["event_status"] == "adjusted")
-        weights = daily_weight(db, "P005")
+        weights = daily_weight(db, identifier("patients", "P005"))
+        patient_checkins = {row[0] for row in db.execute(
+            "SELECT checkin_id FROM checkins WHERE patient_id = ?", (identifier("patients", "P001"),)
+        )}
         if (len(raw_pain) != 29 or len(validated_pain) != 29
-                or any(not row["checkin_id"].startswith("demo-P001-") for row in raw_pain + validated_pain)
+                or any(row["checkin_id"] not in patient_checkins for row in raw_pain + validated_pain)
                 or sum(row["pain_score"] is not None for row in raw_pain) != 29
                 or any(row["pain_score"] is not None for row in validated_pain)
                 or dict(totals) != dict(positive=7, explicit_zero=128, uncertain=0, missing=8, submissions=143)

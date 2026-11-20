@@ -35,9 +35,12 @@ htmlcov/
 /data/phase5_reference_verified.json
 /reproduced-evaluation.json
 /.phase6a-check-*/
+/.migration-backups/
 *.log
 *.tmp
 *.bak
 *.swp
 .DS_Store
 Thumbs.db
+
+/.migration-check-*/

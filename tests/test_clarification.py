@@ -9,13 +9,13 @@ from src.database import apply_schema, connect
 from src.patient_summary import reports_to_clarify, score_rows
 
 
-def report(key="a", text="My throat hurts."):
+def report(key=11, text="My throat hurts."):
     return {"checkin_id": key, "submitted_at": "2026-01-02T08:00:00",
             "submission_date": "2026-01-02", "free_text": text,
             "raw_answers": "{}", "answers": {}}
 
 
-def candidate(key="a", **changes):
+def candidate(key=11, **changes):
     return {"checkin_id": key, "measure": "pain", "status": "present",
             "original_phrase": "My throat hurts.", **changes}
 
@@ -24,7 +24,7 @@ class ClarificationTests(unittest.TestCase):
     def test_unclassified_blank_and_source_filtering(self):
         source = report()
         before = deepcopy(source)
-        rows = reports_to_clarify([source, report("blank", " ")], [], [candidate("other")], {}, {})
+        rows = reports_to_clarify([source, report(99, " ")], [], [candidate(16)], {}, {})
         self.assertEqual(len(rows), 1)
         self.assertIn("Unclassified", rows[0]["reasons"])
         self.assertEqual(rows[0]["free_text"], before["free_text"])
@@ -36,10 +36,10 @@ class ClarificationTests(unittest.TestCase):
         self.assertIn("Coverage unconfirmed", rows[0]["reasons"])
 
     def test_failure_and_rejection_survive_successful_sibling(self):
-        audit = {"a": {"attempts": {"initial": {
+        audit = {11: {"attempts": {"initial": {
             "valid": [candidate()], "rejected": [{"reason": "Nonliteral sibling"}]}}}}
         rows = reports_to_clarify([report()], [], [candidate()],
-                                  {"errors": {"a": "Bad output"}}, audit)
+                                  {"errors": {11: "Bad output"}}, audit)
         self.assertIn("Extraction failed", rows[0]["reasons"])
         self.assertIn("Extraction needs checking", rows[0]["reasons"])
         self.assertIn("Nonliteral sibling", rows[0]["details"])
@@ -47,7 +47,7 @@ class ClarificationTests(unittest.TestCase):
     def test_dedup_uncertainty_and_numeric_disagreement(self):
         source = report()
         source["raw_answers"] = '{"pain_score":0}'
-        group = {"checkin_id": "a", "review_reasons": ["one_parser_only"],
+        group = {"checkin_id": 11, "review_reasons": ["one_parser_only"],
                  "evidence": {"keyword": [candidate(status="uncertain", severity_score=3)],
                               "llm": [], "rejected_llm_observations": []}}
         rows = reports_to_clarify([source, source], [group, group], [], {}, {})
@@ -65,20 +65,20 @@ class ClarificationTests(unittest.TestCase):
         with closing(connect(":memory:")) as db:
             db.row_factory = sqlite3.Row
             apply_schema(db)
-            db.execute("INSERT INTO patients VALUES ('p1','Test','1980-01-01','Test','2026-01-01',NULL)")
+            db.execute("INSERT INTO patients VALUES (1,'Test','1980-01-01','Test','2026-01-01',NULL)")
             db.executemany(
                 "INSERT INTO checkins (checkin_id,patient_id,submitted_at,raw_answers) "
-                "VALUES (?,'p1',?,?)",
-                [("a", "2026-01-01T08:00:00", '{"pain_score":0}'),
-                 ("b", "2026-01-03T08:00:00", '{"pain_score":4}')])
-            db.execute("INSERT INTO treatments VALUES ('m','p1',NULL,'2026-01-02',2,'medication','Test','adjusted')")
-            window = next(row for row in treatment_windows(db, "p1", RAW) if row["measure"] == "pain")
+                "VALUES (?,1,?,?)",
+                [(11, "2026-01-01T08:00:00", '{"pain_score":0}'),
+                 (12, "2026-01-03T08:00:00", '{"pain_score":4}')])
+            db.execute("INSERT INTO treatments VALUES (41,1,NULL,'2026-01-02',2,'medication','Test','adjusted')")
+            window = next(row for row in treatment_windows(db, 1, RAW) if row["measure"] == "pain")
             self.assertEqual((window["before_mean"], window["after_mean"]), (0, 4))
-            empty = next(row for row in treatment_windows(db, "p1") if row["measure"] == "pain")
+            empty = next(row for row in treatment_windows(db, 1) if row["measure"] == "pain")
             self.assertEqual((empty["before_mean"], empty["after_mean"]), (None, None))
             source = report()
             source["answers"] = {"pain_score": 0, "dizziness_score": "uncertain"}
-            rows = score_rows(db, "p1", RAW, [source])
+            rows = score_rows(db, 1, RAW, [source])
             self.assertEqual(next(row["score"] for row in rows if row["measure"] == "pain"), 0)
             self.assertEqual(next(row["availability"] for row in rows if row["measure"] == "dizziness"), "Uncertain")
             self.assertEqual(next(row["score"] for row in rows if row["measure"] == "fatigue"), None)

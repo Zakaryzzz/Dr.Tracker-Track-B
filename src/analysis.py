@@ -3,6 +3,7 @@ import json
 import sqlite3
 
 from .database import DATABASE_PATH, connect
+from .identifiers import load_artifact
 from .extract_symptoms import FLAGS, SCORES
 
 RAW = "Raw questionnaire submissions"
@@ -157,7 +158,7 @@ def coverage(db, patient_id, report_path):
     checkins = records(db, "SELECT checkin_id, treatment_day, raw_answers FROM checkins WHERE patient_id = ?",
                        (patient_id,))
     ids = {row["checkin_id"] for row in checkins}
-    groups = json.loads(report_path.read_text(encoding="utf-8"))["results"]
+    groups = load_artifact(report_path)["results"]
     keys = (*FLAGS, *(f"{measure}_score" for measure in SCORES), "vomiting_count")
     answers = [json.loads(row["raw_answers"]) for row in checkins]
     missing = {key: sum(answer.get(key) is None for answer in answers) for key in keys}

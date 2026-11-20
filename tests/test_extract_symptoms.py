@@ -1,3 +1,4 @@
+from src.identifiers import identifier
 import json
 import unittest
 from contextlib import closing
@@ -66,9 +67,9 @@ class ExtractionTests(unittest.TestCase):
 
     def test_seeded_checkins(self):
         examples = (
-            ("demo-P002-12-1", "vomiting", "absent", None),
-            ("demo-P005-06-1", "dizziness", "uncertain", None),
-            ("demo-P005-14-1", "vomiting", "present", 2),
+            (identifier("checkins", "demo-P002-12-1"), "vomiting", "absent", None),
+            (identifier("checkins", "demo-P005-06-1"), "dizziness", "uncertain", None),
+            (identifier("checkins", "demo-P005-14-1"), "vomiting", "present", 2),
         )
         with closing(connect(DATABASE_PATH.as_uri() + "?mode=ro", uri=True)) as connection:
             for checkin_id, measure, status, count in examples:
@@ -79,7 +80,7 @@ class ExtractionTests(unittest.TestCase):
                     ).fetchone()
                     keyword = self.by_measure(text)[measure]
                     self.assertEqual((keyword["status"], keyword["frequency_count"]), (status, count))
-                    if checkin_id == "demo-P005-14-1":
+                    if checkin_id == identifier("checkins", "demo-P005-14-1"):
                         mapped = next(row for row in map_questionnaire(checkin_id, raw)
                                       if row["measure"] == "vomiting")
                         self.assertEqual((mapped["status"], mapped["frequency_count"]), ("absent", 0))

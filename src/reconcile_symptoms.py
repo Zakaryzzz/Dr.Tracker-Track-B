@@ -8,6 +8,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from .database import DATABASE_PATH, connect
+from .identifiers import load_artifact
 from .extract_symptoms import parse_keywords
 from .llm_extraction import DEFAULT_MODEL, extract_live, location_words
 
@@ -176,7 +177,7 @@ def reconcile(checkin_id, submitted_at, report, questionnaire, keyword, llm,
 
 def read_candidates(path, checkin_ids):
     groups = defaultdict(list)
-    for row in json.loads(path.read_text(encoding="utf-8")):
+    for row in load_artifact(path):
         if row["checkin_id"] in checkin_ids:
             groups[row["checkin_id"]].append(row)
     return groups

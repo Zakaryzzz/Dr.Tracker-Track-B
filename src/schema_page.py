@@ -1,6 +1,7 @@
 """Read-only relational schema page for the Dr.Tracker dashboard."""
 from collections import defaultdict
 from contextlib import closing
+from datetime import date, datetime
 
 import streamlit as st
 
@@ -54,6 +55,14 @@ def show_schema():
             table: [dict(row) for row in db.execute(f"SELECT * FROM {table} ORDER BY 1 LIMIT 2")]
             for table in TABLES
         }
+        for table, _, fields, _ in tables:
+            types = {field["name"]: field["type"] for field in fields}
+            for row in samples[table]:
+                for field, value in row.items():
+                    if value is not None and types[field] == "DATE":
+                        row[field] = date.fromisoformat(value)
+                    elif value is not None and types[field] == "DATETIME":
+                        row[field] = datetime.fromisoformat(value)
 
     st.graphviz_chart(schema_diagram(tables), width="stretch",
                       alt="Five SQLite tables connected by their foreign-key relationships.")

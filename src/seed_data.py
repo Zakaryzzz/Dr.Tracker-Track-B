@@ -8,6 +8,7 @@ from datetime import date, timedelta
 from random import Random
 from uuid import uuid4
 
+from .identifiers import normalize_identifiers
 from .database import DATABASE_PATH, TABLE_KEYS, apply_schema, connect, require
 
 SEED = 732
@@ -158,7 +159,7 @@ def generate():
                 treatment_day=day, event_type=event_type, treatment_name=name,
                 event_status=status,
             ))
-    return data
+    return normalize_identifiers(data)
 
 
 def database_row(table, row):

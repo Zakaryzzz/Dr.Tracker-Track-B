@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from src.analysis import open_readonly
+from src.identifiers import load_artifact
 from src.annotation_review import (
     EDIT_FIELDS, PROGRESS_PATH, edit_case, edit_pair, export_reference, load_review, save_item,
     make_demo_review, update_demo_review,
@@ -165,8 +166,7 @@ def show_review(*, read_only=False):
     st.title("Annotation review")
     st.caption("Dr.Tracker · Phase 5 · Synthetic patient reports")
     try:
-        review = (json.loads(PROGRESS_PATH.with_name("phase5_reference_verified_demo.json")
-                             .read_text(encoding="utf-8")) if read_only else load_review())
+        review = (load_artifact(PROGRESS_PATH.with_name("phase5_reference_verified_demo.json")) if read_only else load_review())
         with closing(open_readonly()) as db:
             reports = {key: (text, timestamp) for key, text, timestamp in db.execute(
                 "SELECT checkin_id, free_text, submitted_at FROM checkins"
@@ -208,7 +208,7 @@ def show_review_demo():
     st.title("Annotation Review")
     st.caption("Interactive demo · Changes stay in this browser session")
     if "annotation_demo" not in st.session_state:
-        draft = json.loads(PROGRESS_PATH.with_name("phase5_reference_draft.json").read_text(encoding="utf-8"))
+        draft = load_artifact(PROGRESS_PATH.with_name("phase5_reference_draft.json"))
         st.session_state["annotation_demo"] = make_demo_review(draft)
     if st.button("Reset demo"):
         generation = st.session_state.get("demo_generation", 0) + 1

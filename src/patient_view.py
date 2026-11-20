@@ -9,6 +9,7 @@ import streamlit as st
 
 from .analysis import RAW, daily_weight, open_readonly, patients, treatment_windows
 from .database import DATABASE_PATH
+from .identifiers import load_artifact
 from .extract_symptoms import FLAGS
 from .patient_summary import numeric, reports_to_clarify, LABELS, medication_events, patient_reports, recent_evidence, score_rows, top_symptom_changes
 
@@ -108,9 +109,9 @@ def render_patient_dashboard():
     if any(not path.is_file() for path in required):
         st.error("The dashboard requires the demo database and saved extraction reports.")
         return
-    reconciliation = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
-    keyword = json.loads(required[2].read_text(encoding="utf-8"))
-    llm = json.loads(required[3].read_text(encoding="utf-8"))
+    reconciliation = load_artifact(REPORT_PATH)
+    keyword = load_artifact(required[2])
+    llm = load_artifact(required[3])
     with closing(open_readonly()) as db:
         people = {r["patient_id"]: r for r in patients(db)}
         if not people:

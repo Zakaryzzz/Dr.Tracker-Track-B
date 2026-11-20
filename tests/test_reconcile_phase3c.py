@@ -1,3 +1,4 @@
+from src.identifiers import identifier
 import json
 import unittest
 from contextlib import closing
@@ -66,7 +67,7 @@ class Phase3CReviewTests(unittest.TestCase):
         self.assertEqual(valid[0]["rejected_fields"]["severity_score"]["value"], 3)
 
     def test_seeded_duplicate_and_distinct_occurrences(self):
-        ids = ("demo-P005-06-1", "demo-P005-06-2", "demo-P005-17-1", "demo-P005-17-2")
+        ids = (identifier("checkins", "demo-P005-06-1"), identifier("checkins", "demo-P005-06-2"), identifier("checkins", "demo-P005-17-1"), identifier("checkins", "demo-P005-17-2"))
         with closing(connect(DATABASE_PATH.as_uri() + "?mode=ro", uri=True)) as db:
             checkins = {key: db.execute(
                 "SELECT patient_id, submitted_at, free_text, raw_answers FROM checkins WHERE checkin_id=?",

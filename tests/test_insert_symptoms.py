@@ -15,15 +15,15 @@ class InsertionTests(unittest.TestCase):
         self.raw = '{"pain_score":0,"vomiting_count":0,"dizziness_score":"uncertain","fever":null}'
         with self.db:
             self.db.execute(
-                "INSERT INTO patients VALUES ('p1', 'Test', '1980-01-01', 'Test', '2026-01-01', NULL)"
+                "INSERT INTO patients VALUES (1, 'Test', '1980-01-01', 'Test', '2026-01-01', NULL)"
             )
             self.db.execute(
                 "INSERT INTO checkins (checkin_id, patient_id, submitted_at, raw_answers) "
-                "VALUES ('c1', 'p1', '2026-01-01T12:00:00', ?)", (self.raw,)
+                "VALUES (11, 1, '2026-01-01T12:00:00', ?)", (self.raw,)
             )
         self.groups = []
-        for answer in map_questionnaire("c1", self.raw):
-            group = compare_group("c1", answer["measure"], "", [answer], [], [], [], False, [])
+        for answer in map_questionnaire(11, self.raw):
+            group = compare_group(11, answer["measure"], "", [answer], [], [], [], False, [])
             group.update(insertion_candidates=group["questionnaire_observations"],
                          insertion_eligibility="eligible", review_status="pending")
             self.groups.append(group)

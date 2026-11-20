@@ -44,7 +44,7 @@ For Streamlit Community Cloud, select `dashboard.py` as the entrypoint and Pytho
 
 ## Reproduce the offline demo
 
-Use **Python 3.12 or newer** with SQLite **3.37 or newer**, including JSON functions. The schema uses STRICT tables and `json_valid()`. Analysis also uses `json_type()` and `json_extract()`. The documented workflow was verified on Windows with Python 3.14.10. The direct dashboard dependencies are pinned in `requirements.txt`.
+Use **Python 3.12 or newer** with SQLite **3.37 or newer**, including JSON functions. The schema uses type and calendar constraints with `json_valid()`. Analysis also uses `json_type()` and `json_extract()`. The documented workflow was verified on Windows with Python 3.14.10. The direct dashboard dependencies are pinned in `requirements.txt`.
 
 From the project root in PowerShell:
 
@@ -106,3 +106,17 @@ Recent Patient Reports displays questionnaire answers and original statements. D
 The medication timeline uses the recorded medication name on its vertical axis. Hover details show status, schedule, dose, and the linked patient statement. The present fixtures contain only a generic Pain medication label with no dose or frequency; those fields display Not recorded. Event IDs stay internal. The standalone vomiting chart and the Data and comparison details panel have been removed from the physician page; the underlying SQL remains available.
 
 The physician follow-up panel displays numbered original statements without extraction-detail controls. The schema page includes two actual synthetic records beneath each table's field definitions. Annotation Review in the dashboard is an interactive sandbox, initialized from unverified draft samples in Streamlit session state. Edits, explicit completion, duplicate-pair review, and reset affect only that session. It offers no verified-reference export or file persistence. The standalone review_annotations.py tool retains its original local persistence workflow.
+
+## Numeric identifiers and date declarations
+
+All primary keys, foreign keys, and optional duplicate-group identifiers use positive INTEGER values. Date-only columns are declared DATE, and submitted_at is declared DATETIME. Calendar checks enforce YYYY-MM-DD and YYYY-MM-DDTHH:MM:SS. SQLite stores these values as ISO text internally because it has no native date storage class. These declarations use ordinary tables with explicit type constraints in place of STRICT, which does not support DATE or DATETIME declarations. Relative phrases in observed_time_text remain free text.
+
+The migration preserves every observation and relationship. For an existing legacy database run:
+
+```powershell
+python -m src.migrate_schema
+python -m src.database --verify
+python -m src.insert_symptoms --verify
+```
+
+A backup is written under .migration-backups before replacement. New databases use the new schema directly. The immutable data/identifier_map.json keeps archived extraction files and reviewed references usable with numeric database keys. Observation IDs retain their legacy identity through a deterministic signed-64-bit hash. Hash collisions abort migration. Original evidence and annotation labels remain intact, while application loaders translate legacy IDs for joins and evaluation.
