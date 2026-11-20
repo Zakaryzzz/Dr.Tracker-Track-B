@@ -50,6 +50,10 @@ def show_schema():
         return
     with closing(open_readonly()) as db:
         tables = list(describe_tables(db))
+        samples = {
+            table: [dict(row) for row in db.execute(f"SELECT * FROM {table} ORDER BY 1 LIMIT 2")]
+            for table in TABLES
+        }
 
     st.graphviz_chart(schema_diagram(tables), width="stretch",
                       alt="Five SQLite tables connected by their foreign-key relationships.")
@@ -73,5 +77,7 @@ def show_schema():
                 }
                 for field in fields
             ], hide_index=True)
+            st.markdown("**Sample data**")
+            st.dataframe(samples[table], hide_index=True)
     with st.expander("View SQL definition"):
         st.code(SCHEMA_PATH.read_text(encoding="utf-8"), language="sql")

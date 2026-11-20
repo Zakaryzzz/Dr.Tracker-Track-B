@@ -13,6 +13,31 @@ EDIT_FIELDS = (
 )
 
 
+def make_demo_review(reference):
+    """Create unreviewed working samples without changing the reference."""
+    demo = deepcopy(reference)
+    for section in ("cases", "duplicate_pairs"):
+        for item in demo[section]:
+            item.update(verification_status="draft", verified_by=None)
+            if section == "duplicate_pairs":
+                item["same_event"] = None
+    return demo
+
+
+def update_demo_review(review, section, index, original, edited):
+    """Return an isolated session copy; use no file or database persistence."""
+    if section not in ("cases", "duplicate_pairs"):
+        raise ValueError("Unknown review section")
+    if review[section][index] != original:
+        raise ValueError("This sample changed. Reload the sample before saving.")
+    identity = case_source if section == "cases" else pair_source
+    if identity(edited) != identity(original):
+        raise ValueError("Original report identity and text must be preserved.")
+    result = deepcopy(review)
+    result[section][index] = deepcopy(edited)
+    return result
+
+
 def case_source(case):
     return tuple(case[key] for key in ("checkin_id", "original_free_text", "submitted_at"))
 

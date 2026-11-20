@@ -4,7 +4,9 @@ from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from src.annotation_review import edit_case, edit_pair, export_reference, load_review, save_item
+from src.annotation_review import (
+    edit_case, edit_pair, export_reference, load_review, save_item, make_demo_review, update_demo_review,
+)
 from src.evaluate import DEFAULT_REFERENCE, load, verified
 
 
@@ -78,3 +80,24 @@ class AnnotationReviewTests(unittest.TestCase):
         self.assertFalse(verified(edit_pair(self.pair, None, None, False, "")))
         with self.assertRaisesRegex(ValueError, "Choose whether"):
             edit_pair(self.pair, None, None, True, "Reviewer")
+
+    def test_demo_starts_pending_and_preserves_reviewed_source(self):
+        original = deepcopy(self.review)
+        original["cases"][0].update(verification_status="verified", verified_by="Fixture")
+        snapshot = deepcopy(original)
+        demo = make_demo_review(original)
+        self.assertFalse(any(verified(case) for case in demo["cases"]))
+        self.assertTrue(all(pair["same_event"] is None for pair in demo["duplicate_pairs"]))
+        demo["cases"][0]["mentions"].clear()
+        self.assertEqual(original, snapshot)
+
+    def test_demo_completion_updates_only_an_isolated_copy(self):
+        demo = make_demo_review(self.review)
+        original = deepcopy(demo)
+        case = demo["cases"][0]
+        edited = edit_case(case, case["mentions"], True, "Demo reviewer")
+        updated = update_demo_review(demo, "cases", 0, case, edited)
+        self.assertTrue(verified(updated["cases"][0]))
+        self.assertEqual(demo, original)
+        with self.assertRaisesRegex(ValueError, "changed"):
+            update_demo_review(updated, "cases", 0, case, edited)

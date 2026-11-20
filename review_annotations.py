@@ -9,6 +9,7 @@ import streamlit as st
 from src.analysis import open_readonly
 from src.annotation_review import (
     EDIT_FIELDS, PROGRESS_PATH, edit_case, edit_pair, export_reference, load_review, save_item,
+    make_demo_review, update_demo_review,
 )
 from src.evaluate import validate_reference, verified
 from src.extract_symptoms import PATTERNS
@@ -28,9 +29,15 @@ def show_report(case):
         st.caption(note)
 
 
-def save_review(section, index, original, edited):
-    save_item(section, index, original, edited)
-    st.session_state["review_saved"] = "Review progress saved."
+def save_review(section, index, original, edited, *, demo=False):
+    if demo:
+        st.session_state["annotation_demo"] = update_demo_review(
+            st.session_state["annotation_demo"], section, index, original, edited
+        )
+        st.session_state["demo_message"] = "Demo progress updated for this session."
+    else:
+        save_item(section, index, original, edited)
+        st.session_state["review_saved"] = "Review progress saved."
     st.rerun()
 
 
@@ -49,17 +56,18 @@ def editor_rows(frame):
     return rows
 
 
-def review_case(cases, reviewer, *, read_only=False):
+def review_case(cases, reviewer, *, read_only=False, demo=False):
     st.subheader("Check-in review")
     indices = list(range(len(cases)))
     first_pending = next((i for i in indices if not verified(cases[i])), 0)
-    index = st.selectbox("Check-in", indices, index=first_pending, key="case_navigation",
+    index = st.selectbox("Check-in", indices, index=first_pending,
+                         key="demo_case_navigation" if demo else "case_navigation",
                          format_func=lambda i: f"{cases[i]['checkin_id']} · "
-                         f"{'Verified' if verified(cases[i]) else 'Incomplete'}")
+                         f"{'Reviewed in demo' if demo and verified(cases[i]) else 'Verified' if verified(cases[i]) else 'Needs review'}")
     case = cases[index]
     show_report(case)
     if verified(case):
-        st.success(f"Verified by {case['verified_by']}")
+        st.success("Reviewed in this demo session." if demo else f"Verified by {case['verified_by']}")
     if read_only:
         if case["mentions"]:
             st.dataframe(pd.DataFrame(case["mentions"], columns=EDIT_FIELDS), hide_index=True)
@@ -74,7 +82,8 @@ def review_case(cases, reviewer, *, read_only=False):
     for name in EDIT_FIELDS:
         if name not in ("severity_score", "frequency_count"):
             frame[name] = frame[name].astype("string")
-    form_key = f"case-{case['checkin_id']}-{revision(case)}"
+    prefix = f"demo-{st.session_state.get('demo_generation', 0)}" if demo else "case"
+    form_key = f"{prefix}-{case['checkin_id']}-{revision(case)}"
     with st.form(form_key):
         edited = st.data_editor(
             frame, num_rows="dynamic", hide_index=True, width="stretch",
@@ -91,29 +100,30 @@ def review_case(cases, reviewer, *, read_only=False):
                 "notes": st.column_config.TextColumn("Ambiguity notes"),
             },
         )
-        confirm = st.checkbox("I independently checked all symptom mentions for this report.")
+        confirm = st.checkbox("I checked all mentions in this demo sample." if demo
+                              else "I independently checked all symptom mentions for this report.")
         draft_button, verify_button = st.columns(2)
-        save_draft = draft_button.form_submit_button("Save as incomplete")
-        save_verified = verify_button.form_submit_button("Save verified review", type="primary")
+        save_draft = draft_button.form_submit_button("Keep pending in demo" if demo else "Save as incomplete")
+        save_verified = verify_button.form_submit_button("Complete demo review" if demo else "Save verified review", type="primary")
     if save_draft or save_verified:
         try:
             if save_verified and not confirm:
                 raise ValueError("Confirm that you checked all symptom mentions before verifying.")
             updated = edit_case(case, editor_rows(edited), save_verified, reviewer)
-            save_review("cases", index, case, updated)
+            save_review("cases", index, case, updated, demo=demo)
         except (ValueError, TypeError, OSError) as error:
             st.error(str(error))
 
 
-def review_pairs(pairs, cases, reviewer, *, read_only=False):
+def review_pairs(pairs, cases, reviewer, *, read_only=False, demo=False):
     st.subheader("Duplicate-event review")
     if not pairs:
         st.info("There are no duplicate-event pairs in this sample.")
         return
     indices = list(range(len(pairs)))
-    index = st.selectbox("Check-in pair", indices, key="pair_navigation",
+    index = st.selectbox("Check-in pair", indices, key="demo_pair_navigation" if demo else "pair_navigation",
                          format_func=lambda i: f"{' / '.join(pairs[i]['checkin_ids'])} · "
-                         f"{'Verified' if verified(pairs[i]) else 'Incomplete'}")
+                         f"{'Reviewed in demo' if demo and verified(pairs[i]) else 'Verified' if verified(pairs[i]) else 'Needs review'}")
     pair = pairs[index]
     st.caption(f"Symptom under review · {pair['measure']}")
     case_by_id = {case["checkin_id"]: case for case in cases}
@@ -132,19 +142,21 @@ def review_pairs(pairs, cases, reviewer, *, read_only=False):
                "Record any additional distinct occurrence in the notes.")
     options = list(PAIR_DECISIONS)
     selected = next(i for i, label in enumerate(PAIR_DECISIONS.values()) if label is pair["same_event"])
-    with st.form(f"pair-{index}-{revision(pair)}"):
+    prefix = f"demo-pair-{st.session_state.get('demo_generation', 0)}" if demo else "pair"
+    with st.form(f"{prefix}-{index}-{revision(pair)}"):
         label = st.radio("Relationship", options, index=selected)
         notes = st.text_area("Pair notes", value=pair.get("notes") or "")
-        confirm = st.checkbox("I independently checked both reports and the selected relationship.")
+        confirm = st.checkbox("I checked both reports and the relationship in this demo." if demo
+                              else "I independently checked both reports and the selected relationship.")
         draft_button, verify_button = st.columns(2)
-        save_draft = draft_button.form_submit_button("Save pair as incomplete")
-        save_verified = verify_button.form_submit_button("Save verified pair", type="primary")
+        save_draft = draft_button.form_submit_button("Keep pair pending in demo" if demo else "Save pair as incomplete")
+        save_verified = verify_button.form_submit_button("Complete demo pair review" if demo else "Save verified pair", type="primary")
     if save_draft or save_verified:
         try:
             if save_verified and not confirm:
                 raise ValueError("Confirm the relationship before verifying this pair.")
             updated = edit_pair(pair, PAIR_DECISIONS[label], notes or None, save_verified, reviewer)
-            save_review("duplicate_pairs", index, pair, updated)
+            save_review("duplicate_pairs", index, pair, updated, demo=demo)
         except (ValueError, TypeError, OSError) as error:
             st.error(str(error))
 
@@ -193,7 +205,30 @@ def show_review(*, read_only=False):
 
 
 def show_review_demo():
-    show_review(read_only=True)
+    st.title("Annotation Review")
+    st.caption("Interactive demo · Changes stay in this browser session")
+    if "annotation_demo" not in st.session_state:
+        draft = json.loads(PROGRESS_PATH.with_name("phase5_reference_draft.json").read_text(encoding="utf-8"))
+        st.session_state["annotation_demo"] = make_demo_review(draft)
+    if st.button("Reset demo"):
+        generation = st.session_state.get("demo_generation", 0) + 1
+        for key in list(st.session_state):
+            if key == "annotation_demo" or key.startswith("demo"):
+                del st.session_state[key]
+        st.session_state["demo_generation"] = generation
+        st.rerun()
+    review = st.session_state["annotation_demo"]
+    cases, pairs = review["cases"], review["duplicate_pairs"]
+    completed = sum(verified(case) for case in cases)
+    st.progress(completed / len(cases), text=f"{completed}/{len(cases)} samples reviewed in demo")
+    st.caption(f"{sum(verified(pair) for pair in pairs)}/{len(pairs)} pairs reviewed in demo")
+    if message := st.session_state.pop("demo_message", None):
+        st.success(message)
+    view = st.radio("Review", ("Check-ins", "Duplicate pairs"), horizontal=True, key="demo_view")
+    if view == "Check-ins":
+        review_case(cases, "Demo reviewer", demo=True)
+    else:
+        review_pairs(pairs, cases, "Demo reviewer", demo=True)
 
 
 def main():

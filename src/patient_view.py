@@ -56,26 +56,16 @@ def severity_chart(scores, measures, events):
 
 
 def show_clarification_panel(items, patient_id):
-    st.subheader("Reports to Clarify")
+    st.subheader("Questions for the Doctor")
     if not items:
         st.caption("No reports flagged by the saved extraction records.")
         return
-    st.caption(f"{len(items)} reports · newest first")
     page_count = (len(items) + 3) // 4
     page = st.selectbox("Report page", range(page_count), key=f"clarify-page-{patient_id}",
                         format_func=lambda index: f"{index + 1} of {page_count}") if page_count > 1 else 0
     with st.container(height=440, border=True):
-        for item in items[page * 4:(page + 1) * 4]:
-            st.caption(item["submitted_at"])
-            st.markdown(" · ".join(f"**{reason}**" for reason in item["reasons"]))
-            st.text(item["free_text"])
-            with st.expander("Evidence details", expanded=False):
-                st.caption(item["checkin_id"])
-                for detail in item["details"]:
-                    st.write(detail)
-                if "Coverage unconfirmed" in item["reasons"]:
-                    st.write("Some wording lies outside saved evidence spans; it may be context or an unrecognized symptom.")
-            st.divider()
+        for number, item in enumerate(items[page * 4:(page + 1) * 4], start=page * 4 + 1):
+            st.markdown(f"{number}. {item['free_text']}")
 
 
 def recent_questionnaire_rows(reports):
