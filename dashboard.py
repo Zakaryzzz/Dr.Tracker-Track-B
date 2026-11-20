@@ -3,6 +3,7 @@ import streamlit as st
 
 from src.patient_view import render_patient_dashboard
 from src.schema_page import show_schema
+from src.extraction_rules_page import show_extraction_rules
 from review_annotations import show_review_demo
 
 
@@ -16,6 +17,7 @@ def main():
         st.Page(show_dashboard, title="Patient Dashboard", default=True),
         st.Page(show_schema, title="Relational Schema", url_path="schema"),
         st.Page(show_review_demo, title="Annotation Review", url_path="annotation-review"),
+        st.Page(show_extraction_rules, title="Extraction Rules", url_path="extraction-rules"),
     ])
     page.run()
 
