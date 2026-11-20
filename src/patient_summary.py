@@ -248,6 +248,7 @@ def vomiting_summary(reports, end_date=None):
 def medication_events(db, patient_id):
     return records(db, """
         SELECT t.event_id, t.event_date, t.treatment_name, t.event_status, t.treatment_day,
+               t.medication_frequency, t.medication_details_source,
                c.free_text AS reported_details
         FROM treatments t LEFT JOIN checkins c
           ON c.checkin_id = t.checkin_id AND c.patient_id = t.patient_id

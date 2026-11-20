@@ -167,12 +167,13 @@ def render_patient_dashboard():
         if events:
             frame = pd.DataFrame(events)
             frame["event_date"] = pd.to_datetime(frame["event_date"])
-            frame["Schedule"] = "Not recorded"
-            frame["Dose"] = "Not recorded"
+            frame["Schedule"] = frame["medication_frequency"].fillna("Not recorded")
+            frame.loc[frame["event_status"] == "completed", "Schedule"] = "Course completed"
+            frame["Source"] = frame["medication_details_source"].fillna("Treatment record")
             frame["Patient report"] = frame["reported_details"].fillna("No linked patient statement")
             timeline = px.scatter(
                 frame, x="event_date", y="treatment_name", color="event_status", symbol="event_status",
-                custom_data=["treatment_name", "event_status", "Schedule", "Dose", "Patient report"],
+                custom_data=["treatment_name", "event_status", "Schedule", "Source", "Patient report"],
                 color_discrete_map={"started": "#136f70", "adjusted": "#bc7730",
                                     "stopped": "#946083", "completed": "#667981"},
                 labels={"event_date": "Recorded date", "treatment_name": "", "event_status": "Status"},
@@ -181,7 +182,7 @@ def render_patient_dashboard():
                 marker_size=13,
                 hovertemplate=("<b>%{customdata[0]}</b><br>Date: %{x|%b %d, %Y}"
                                "<br>Status: %{customdata[1]}<br>Schedule: %{customdata[2]}"
-                               "<br>Dose: %{customdata[3]}<br>Patient report: %{customdata[4]}<extra></extra>"),
+                               "<br>Source: %{customdata[3]}<br>Patient report: %{customdata[4]}<extra></extra>"),
             )
             timeline.update_layout(height=250, yaxis_title=None)
             st.plotly_chart(timeline, width="stretch")

@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS treatments (
     event_type TEXT NOT NULL CHECK (event_type IS NULL OR typeof(event_type) = 'text'),
     treatment_name TEXT NOT NULL CHECK (treatment_name IS NULL OR typeof(treatment_name) = 'text'),
     event_status TEXT NOT NULL CHECK (event_status IS NULL OR typeof(event_status) = 'text'),
+    medication_frequency TEXT CHECK (medication_frequency IS NULL OR typeof(medication_frequency) = 'text'),
+    medication_details_source TEXT CHECK (medication_details_source IS NULL OR typeof(medication_details_source) = 'text'),
     FOREIGN KEY (checkin_id, patient_id) REFERENCES checkins(checkin_id, patient_id)
 );
 

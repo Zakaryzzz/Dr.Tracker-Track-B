@@ -9,6 +9,7 @@ from random import Random
 from uuid import uuid4
 
 from .identifiers import normalize_identifiers
+from .demo_medications import MEDICATION_NAME, MEDICATION_SOURCE, MEDICATION_SCHEDULES
 from .database import DATABASE_PATH, TABLE_KEYS, apply_schema, connect, require
 
 SEED = 732
@@ -151,13 +152,18 @@ def generate():
             ])
         events.append((28, "follow_up", "Treatment follow-up", "completed", False))
         for day, event_type, name, status, reported in events:
+            frequency = source = None
+            if patient_id == "P003" and event_type == "medication":
+                name = MEDICATION_NAME
+                status, frequency = MEDICATION_SCHEDULES[day]
+                source = MEDICATION_SOURCE
             data["treatments"].append(dict(
                 event_id=f"demo-{patient_id}-{day:02d}-{event_type}",
                 patient_id=patient_id,
                 checkin_id=f"demo-{patient_id}-{day:02d}-1" if reported else None,
                 event_date=(start + timedelta(days=day - 1)).isoformat(),
                 treatment_day=day, event_type=event_type, treatment_name=name,
-                event_status=status,
+                event_status=status, medication_frequency=frequency, medication_details_source=source,
             ))
     return normalize_identifiers(data)
 

@@ -58,7 +58,7 @@ class PatientSummaryTests(unittest.TestCase):
         scores = score_rows(self.db, 1, RAW, reports)
         context, _ = visit_comparison(self.db, 1, reports, scores)
         self.assertIn("two latest submissions", context)
-        self.db.execute("INSERT INTO treatments VALUES (41,1,NULL,'2026-01-06',6,'follow_up','Visit','completed')")
+        self.db.execute("INSERT INTO treatments (event_id, patient_id, checkin_id, event_date, treatment_day, event_type, treatment_name, event_status) VALUES (41,1,NULL,'2026-01-06',6,'follow_up','Visit','completed')")
         context, changes = visit_comparison(self.db, 1, reports, scores)
         self.assertIn("2026-01-06T08:00:00", context)
         self.assertIn("Pain 0/10 → 4/10 (+4).", changes)
@@ -97,7 +97,7 @@ class PatientSummaryTests(unittest.TestCase):
         self.assertIsNone(top[0]["delta"])
         self.assertIn("Two recorded visits", period)
         self.db.executemany(
-            "INSERT INTO treatments VALUES (?, 1, NULL, ?, NULL, 'follow_up', 'Visit', 'completed')",
+            "INSERT INTO treatments (event_id, patient_id, checkin_id, event_date, treatment_day, event_type, treatment_name, event_status) VALUES (?, 1, NULL, ?, NULL, 'follow_up', 'Visit', 'completed')",
             [(401, "2026-01-06"), (402, "2026-01-14")],
         )
         top, period = top_symptom_changes(self.db, 1, reports, scores, "Last two visits")

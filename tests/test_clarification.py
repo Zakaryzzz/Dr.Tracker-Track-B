@@ -71,7 +71,7 @@ class ClarificationTests(unittest.TestCase):
                 "VALUES (?,1,?,?)",
                 [(11, "2026-01-01T08:00:00", '{"pain_score":0}'),
                  (12, "2026-01-03T08:00:00", '{"pain_score":4}')])
-            db.execute("INSERT INTO treatments VALUES (41,1,NULL,'2026-01-02',2,'medication','Test','adjusted')")
+            db.execute("INSERT INTO treatments (event_id, patient_id, checkin_id, event_date, treatment_day, event_type, treatment_name, event_status) VALUES (41,1,NULL,'2026-01-02',2,'medication','Test','adjusted')")
             window = next(row for row in treatment_windows(db, 1, RAW) if row["measure"] == "pain")
             self.assertEqual((window["before_mean"], window["after_mean"]), (0, 4))
             empty = next(row for row in treatment_windows(db, 1) if row["measure"] == "pain")

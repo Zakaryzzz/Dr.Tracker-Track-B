@@ -44,7 +44,8 @@ def migrate(path=DATABASE_PATH):
                         placeholders = ", ".join("?" for _ in row)
                         db.execute(f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", tuple(row.values()))
                 for table, (key, _) in TABLE_KEYS.items():
-                    expected = {row[key]: row for row in rows[table]}
+                    columns = [column["name"] for column in db.execute(f"PRAGMA table_info({table})")]
+                    expected = {row[key]: {column: row.get(column) for column in columns} for row in rows[table]}
                     if len(expected) != len(rows[table]):
                         raise ValueError(f"Numeric identifier collision in {table}")
                     actual = {row[key]: dict(row) for row in db.execute(f"SELECT * FROM {table}")}

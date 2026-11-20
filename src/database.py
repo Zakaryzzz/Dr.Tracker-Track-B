@@ -53,6 +53,19 @@ def apply_schema(connection):
     if existing and (existing.get("patient_id") != "INTEGER" or existing.get("date_of_birth") != "DATE"):
         raise RuntimeError("Legacy database detected. Run python -m src.migrate_schema first.")
     connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+    with connection:
+        ensure_medication_columns(connection)
+
+
+def ensure_medication_columns(connection):
+    """Add optional metadata while preserving older treatment records."""
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(treatments)")}
+    for name in ("medication_frequency", "medication_details_source"):
+        if name not in columns:
+            connection.execute(
+                f"ALTER TABLE treatments ADD COLUMN {name} TEXT "
+                f"CHECK ({name} IS NULL OR typeof({name}) = 'text')"
+            )
 
 
 def table_names(connection):
@@ -125,7 +138,7 @@ def verify_schema():
                          insert_weight, (2, 150), "SQLITE_CONSTRAINT_FOREIGNKEY")
         expect_rejection(
             connection, "Treatment check-in belongs to another patient",
-            "INSERT INTO treatments VALUES (41, 2, 11, '2026-01-01', 1, 'test', 'test', 'test')",
+            "INSERT INTO treatments (event_id, patient_id, checkin_id, event_date, treatment_day, event_type, treatment_name, event_status) VALUES (41, 2, 11, '2026-01-01', 1, 'test', 'test', 'test')",
             (), "SQLITE_CONSTRAINT_FOREIGNKEY",
         )
         connection.commit()

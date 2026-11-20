@@ -60,7 +60,7 @@ class AnalysisTests(unittest.TestCase):
         self.assertEqual(sum(row["submissions"] for row in weekly_vomiting(self.db, 1)), 5)
 
     def test_treatment_windows_and_insufficient_data(self):
-        self.db.execute("INSERT INTO treatments VALUES (41, 1, NULL, '2026-01-06', NULL, 'medication', 'Test', 'adjusted')")
+        self.db.execute("INSERT INTO treatments (event_id, patient_id, checkin_id, event_date, treatment_day, event_type, treatment_name, event_status) VALUES (41, 1, NULL, '2026-01-06', NULL, 'medication', 'Test', 'adjusted')")
         row = next(row for row in treatment_windows(self.db, 1) if row["measure"] == "pain")
         self.assertEqual((row["before_submissions"], row["after_submissions"]), (2, 1))
         self.assertEqual((row["before_scores"], row["after_scores"]), (1, 0))
