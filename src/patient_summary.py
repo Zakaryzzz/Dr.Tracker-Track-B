@@ -163,6 +163,50 @@ def daily_scores(rows):
     return list(latest.values())
 
 
+def top_symptom_changes(db, patient_id, reports, scores, comparison="7-day windows"):
+    """Rank current numeric scores and compare only explicitly available reports."""
+    if comparison not in ("7-day windows", "Last two visits"):
+        raise ValueError("Unknown comparison period")
+    latest = reports[-1]
+    ranked = sorted(
+        (row for row in scores if row["checkin_id"] == latest["checkin_id"] and row["score"] is not None),
+        key=lambda row: (-row["score"], list(LABELS).index(row["measure"])),
+    )[:3]
+    period = "Latest 7 submission days vs preceding 7"
+    visit_reports = []
+    if comparison == "Last two visits":
+        visits = records(db, """
+            SELECT DISTINCT event_date FROM treatments WHERE patient_id = ?
+            AND event_type = 'follow_up' AND event_date <= ?
+            ORDER BY event_date DESC LIMIT 2
+        """, (patient_id, latest["submission_date"]))
+        for visit in reversed(visits):
+            visit_reports.append(next(
+                (report for report in reversed(reports) if report["submission_date"] <= visit["event_date"]), None
+            ))
+        period = ("Two recorded visits are required." if len(visits) < 2 else
+                  f"Visit dates {visits[1]['event_date']} → {visits[0]['event_date']}")
+    index = {(row["checkin_id"], row["measure"]): row["score"] for row in scores}
+    result = []
+    for row in ranked:
+        before = after = delta = None
+        state = "Insufficient Data"
+        if comparison == "7-day windows":
+            state, change = trend_summary(
+                [item for item in scores if item["measure"] == row["measure"]], latest["submission_date"]
+            )
+            if change:
+                before, after, delta = change["before"], change["after"], change["delta"]
+        elif (len(visit_reports) == 2 and all(visit_reports)
+              and visit_reports[0]["checkin_id"] != visit_reports[1]["checkin_id"]):
+            before, after = [index[report["checkin_id"], row["measure"]] for report in visit_reports]
+            if before is not None and after is not None:
+                delta = after - before
+                state = "Stable" if abs(delta) < 1 else "Worsening" if delta > 0 else "Improving"
+        result.append({**row, "before": before, "after": after, "delta": delta, "status": state})
+    return result, period
+
+
 def trend_summary(rows, end_date):
     end = date.fromisoformat(end_date)
     current_start, previous_start = end - timedelta(days=6), end - timedelta(days=13)
@@ -203,9 +247,12 @@ def vomiting_summary(reports, end_date=None):
 
 def medication_events(db, patient_id):
     return records(db, """
-        SELECT event_id, event_date, treatment_name, event_status, treatment_day
-        FROM treatments WHERE patient_id = ? AND event_type = 'medication'
-        ORDER BY event_date, event_id
+        SELECT t.event_id, t.event_date, t.treatment_name, t.event_status, t.treatment_day,
+               c.free_text AS reported_details
+        FROM treatments t LEFT JOIN checkins c
+          ON c.checkin_id = t.checkin_id AND c.patient_id = t.patient_id
+        WHERE t.patient_id = ? AND t.event_type = 'medication'
+        ORDER BY t.event_date, t.event_id
     """, (patient_id,))
 
 

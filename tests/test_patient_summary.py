@@ -6,7 +6,7 @@ from src.analysis import RAW, VALIDATED
 from src.database import apply_schema, connect
 from src.patient_summary import (
     daily_scores, medication_events, patient_reports, recent_evidence,
-    score_rows, trend_summary, visit_comparison, vomiting_summary,
+    score_rows, top_symptom_changes, trend_summary, visit_comparison, vomiting_summary,
 )
 
 
@@ -74,3 +74,41 @@ class PatientSummaryTests(unittest.TestCase):
         self.assertIn("keyword: pain (uncertain)", recent[0]["Extracted symptoms"])
         self.assertIn("needs review", recent[0]["Uncertainty / validation"])
         self.assertEqual(medication_events(self.db, "p2"), [])
+
+    def test_top_three_rank_latest_scores_and_keep_individual_changes(self):
+        self.db.execute(
+            "UPDATE checkins SET raw_answers = ? WHERE checkin_id = 'c14'",
+            ('{"pain_score":9,"fatigue_score":3,"dry_mouth_score":2,"dizziness_score":1}',),
+        )
+        reports = patient_reports(self.db, "p1")
+        scores = score_rows(self.db, "p1", RAW, reports)
+        top, period = top_symptom_changes(self.db, "p1", reports, scores)
+        self.assertEqual([(row["measure"], row["score"]) for row in top],
+                         [("pain", 9), ("fatigue", 3), ("dry_mouth", 2)])
+        self.assertIsNotNone(top[0]["delta"])
+        self.assertEqual(top[0]["status"], "Worsening")
+        self.assertIsNone(top[1]["delta"])
+        self.assertIn("7", period)
+
+    def test_visit_comparison_requires_two_distinct_recorded_visits(self):
+        reports = patient_reports(self.db, "p1")
+        scores = score_rows(self.db, "p1", RAW, reports)
+        top, period = top_symptom_changes(self.db, "p1", reports, scores, "Last two visits")
+        self.assertIsNone(top[0]["delta"])
+        self.assertIn("Two recorded visits", period)
+        self.db.executemany(
+            "INSERT INTO treatments VALUES (?, 'p1', NULL, ?, NULL, 'follow_up', 'Visit', 'completed')",
+            [("v1", "2026-01-06"), ("v2", "2026-01-14")],
+        )
+        top, period = top_symptom_changes(self.db, "p1", reports, scores, "Last two visits")
+        self.assertEqual((top[0]["before"], top[0]["after"], top[0]["delta"]), (0, 4, 4))
+        self.assertIn("2026-01-06", period)
+
+    def test_top_scores_exclude_uncertain_and_missing_but_preserve_zero(self):
+        self.db.execute(
+            "UPDATE checkins SET raw_answers = ? WHERE checkin_id = 'c14'",
+            ('{"pain_score":0,"fatigue_score":null,"dizziness_score":"uncertain"}',),
+        )
+        reports = patient_reports(self.db, "p1")
+        top, _ = top_symptom_changes(self.db, "p1", reports, score_rows(self.db, "p1", RAW, reports))
+        self.assertEqual([(row["measure"], row["score"]) for row in top], [("pain", 0)])

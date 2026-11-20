@@ -1,17 +1,16 @@
 """Patient-focused Streamlit reporting view."""
 import json
 from contextlib import closing
-from datetime import date, timedelta
 
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from .analysis import RAW, coverage, daily_weight, open_readonly, patients, treatment_windows, weekly_vomiting
+from .analysis import RAW, daily_weight, open_readonly, patients, treatment_windows
 from .database import DATABASE_PATH
 from .extract_symptoms import FLAGS
-from .patient_summary import numeric, reports_to_clarify, LABELS, latest_symptoms, medication_events, patient_reports, recent_evidence, score_rows, trend_summary, visit_comparison, vomiting_summary
+from .patient_summary import numeric, reports_to_clarify, LABELS, medication_events, patient_reports, recent_evidence, score_rows, top_symptom_changes
 
 REPORT_PATH = DATABASE_PATH.with_name("phase3c1_reconciliation.json")
 COLORS = {"pain": "#136f70", "dizziness": "#8964a5", "fatigue": "#bc7730", "dry_mouth": "#467bc1"}
@@ -140,37 +139,22 @@ def render_patient_dashboard():
                    f"· Treatment days {reports[0]['treatment_day']}–{reports[-1]['treatment_day']}")
         scores = score_rows(db, patient_id, RAW, reports)
         events = medication_events(db, patient_id)
-        latest_day = reports[-1]["submission_date"]
-        state, biggest = trend_summary(scores, latest_day)
-        status_col, symptoms_col = st.columns([1, 3])
-        status_col.metric("Reported trend", state)
-        current = latest_symptoms(db, reports[-1], RAW)
-        symptoms_col.markdown("**Latest symptoms**")
-        symptoms_col.write(" · ".join(current) if current else "No positive or uncertain symptoms reported.")
-        vomit = vomiting_summary(reports)
-        last_med = next((event for event in reversed(events) if event["event_date"] <= latest_day), None)
-        cards = st.columns(3)
-        cards[0].metric("Vomiting · reported count sum", "Not reported" if vomit["sum"] is None else str(vomit["sum"]))
-        cards[0].caption(f"{vomit['start']} – {vomit['end']} · {vomit['numeric']}/{vomit['submissions']} numeric answers")
-        cards[1].metric("Largest score change", f"{biggest['delta']:+.1f}/10" if biggest else "Insufficient data")
-        cards[1].caption(f"{LABELS[biggest['measure']]} · {biggest['before']:.1f} → {biggest['after']:.1f}"
-                         if biggest else "Fewer than three scores per comparison window.")
-        cards[2].metric("Latest medication change", last_med["event_status"].capitalize() if last_med else "None recorded")
-        cards[2].caption(f"{last_med['treatment_name']} · {last_med['event_date']}" if last_med else "")
-
-        st.subheader("What Changed Since the Last Visit?")
-        baseline, changes = visit_comparison(db, patient_id, reports, scores)
-        with st.container(border=True):
-            st.write(" ".join(changes) if changes else "No comparable numeric scores.")
-            st.caption(baseline)
-            if biggest:
-                st.write(f"Seven-day average {LABELS[biggest['measure']].lower()}: "
-                         f"{biggest['before']:.1f}/10 → {biggest['after']:.1f}/10.")
-            prior_end = (date.fromisoformat(latest_day) - timedelta(days=7)).isoformat()
-            prior_vomiting = vomiting_summary(reports, prior_end)
-            if prior_vomiting["sum"] is not None and vomit["sum"] is not None:
-                st.write(f"Reported vomiting count sums: {prior_vomiting['sum']} → {vomit['sum']} "
-                         "across the previous and latest seven submission days.")
+        st.subheader("Most Severe Symptoms")
+        comparison = st.selectbox("Compare changes", ("7-day windows", "Last two visits"))
+        top, period = top_symptom_changes(db, patient_id, reports, scores, comparison)
+        st.caption(f"Latest questionnaire scores · {period}")
+        if top:
+            for column, item in zip(st.columns(len(top)), top):
+                with column:
+                    st.metric(LABELS[item["measure"]], f"{item['score']}/10",
+                              delta=f"{item['delta']:+.1f} points" if item["delta"] is not None else None,
+                              delta_color="inverse")
+                    if item["delta"] is not None:
+                        st.caption(f"{item['status']} · {item['before']:.1f} → {item['after']:.1f}/10")
+                    else:
+                        st.caption("Insufficient comparison data")
+        else:
+            st.info("No numeric symptom scores in the latest questionnaire.")
 
         graph_col, clarify_col = st.columns([2.4, 1], gap="large")
         items = reports_to_clarify(reports, reconciliation["results"], keyword, llm,
@@ -188,40 +172,37 @@ def render_patient_dashboard():
         with clarify_col:
             show_clarification_panel(items, patient_id)
 
-        st.subheader("Vomiting Reports")
-        st.caption("By submission week · Reporting periods unknown; counts may overlap.")
-        frequency = pd.DataFrame(weekly_vomiting(db, patient_id))
-        if not frequency.empty:
-            frequency["week_start"] = pd.to_datetime(frequency["week_start"])
-            graph = px.bar(frequency, x="week_start", y="reported_count_sum",
-                           labels={"week_start": "Week starting Monday",
-                                   "reported_count_sum": "Reported count sum"},
-                           color_discrete_sequence=["#136f70"])
-            st.plotly_chart(graph, width="stretch")
-            with st.expander("Weekly responses"):
-                st.dataframe(frequency.rename(columns={"positive": "Positive", "explicit_zero": "Zero",
-                                                      "uncertain": "Uncertain", "missing": "Missing",
-                                                      "reported_count_sum": "Count sum",
-                                                      "submissions": "Submissions"}).drop(columns="patient_id"),
-                             hide_index=True, width="stretch")
-
         st.subheader("Medication Timeline")
         if events:
             frame = pd.DataFrame(events)
             frame["event_date"] = pd.to_datetime(frame["event_date"])
-            timeline = px.scatter(frame, x="event_date", y="treatment_name", color="event_status",
-                                  symbol="event_status", hover_data=["event_id", "treatment_day"],
-                                  labels={"event_date": "Recorded date", "treatment_name": "Medication",
-                                          "event_status": "Status"},
-                                  color_discrete_map={"started": "#136f70", "adjusted": "#bc7730",
-                                                      "stopped": "#946083", "completed": "#667981"})
-            timeline.update_traces(marker_size=13)
-            timeline.update_layout(height=230)
+            frame["Schedule"] = "Not recorded"
+            frame["Dose"] = "Not recorded"
+            frame["Patient report"] = frame["reported_details"].fillna("No linked patient statement")
+            timeline = px.scatter(
+                frame, x="event_date", y="treatment_name", color="event_status", symbol="event_status",
+                custom_data=["treatment_name", "event_status", "Schedule", "Dose", "Patient report"],
+                color_discrete_map={"started": "#136f70", "adjusted": "#bc7730",
+                                    "stopped": "#946083", "completed": "#667981"},
+                labels={"event_date": "Recorded date", "treatment_name": "", "event_status": "Status"},
+            )
+            timeline.update_traces(
+                marker_size=13,
+                hovertemplate=("<b>%{customdata[0]}</b><br>Date: %{x|%b %d, %Y}"
+                               "<br>Status: %{customdata[1]}<br>Schedule: %{customdata[2]}"
+                               "<br>Dose: %{customdata[3]}<br>Patient report: %{customdata[4]}<extra></extra>"),
+            )
+            timeline.update_layout(height=250, yaxis_title=None)
             st.plotly_chart(timeline, width="stretch")
             with st.expander("Scores before / after changes"):
                 st.caption("Patient questionnaire scores · Seven submission days either side, excluding the event day. "
                            "Latest submission per date; at least three scores per side. Association does not establish causation.")
-                st.dataframe(treatment_windows(db, patient_id, layer=RAW), hide_index=True)
+                comparisons = pd.DataFrame(treatment_windows(db, patient_id, layer=RAW))
+                if not comparisons.empty:
+                    comparisons = comparisons.drop(columns=["event_id"])
+                    comparisons = comparisons.rename(columns={"treatment_name": "Medication"})
+                    comparisons = comparisons[["Medication"] + [name for name in comparisons if name != "Medication"]]
+                    st.dataframe(comparisons, hide_index=True)
         else:
             st.caption("No medication changes recorded.")
         st.subheader("Recent Patient Reports")
@@ -239,14 +220,3 @@ def render_patient_dashboard():
                     chart.add_hline(y=patient["weight_threshold_lb"], line_dash="dash",
                                     annotation_text="Synthetic threshold")
                 st.plotly_chart(chart, width="stretch")
-        with st.expander("Data and comparison details"):
-            st.write("Scores and summaries use original questionnaire answers. Dates refer to submissions. "
-                     "Trend status uses the largest absolute change in daily mean scores between the latest "
-                     "seven days and the preceding seven, with at least three scores each. Changes under one point "
-                     "are stable. The latest submission on each date supplies that day's score, including blanks.")
-            st.write("Clarification flags use saved parser outputs, failed attempts, rejected fields, differing "
-                     "answers and unmatched wording. A matched quotation cannot prove complete extraction coverage.")
-            stats = coverage(db, patient_id, REPORT_PATH)
-            st.write(f"{stats['checkins']} submissions · {stats['unresolved_groups']} unresolved groups")
-            st.dataframe(pd.DataFrame(stats["missing_fields"].items(), columns=["Questionnaire field", "Missing"]),
-                         hide_index=True)
